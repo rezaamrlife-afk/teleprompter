@@ -612,7 +612,16 @@ function updateProgressUI(){
 let scrollPos = 0; // exact fractional scroll position, independent of the browser's rounded scrollTop
 
 function tick(){
-  if(playing){
+  if(voiceActive && voiceTargetScroll !== null){
+    const diff = voiceTargetScroll - scrollPos;
+    // ease toward the target; snap when very close to avoid endless tiny jitter
+    if(Math.abs(diff) < 0.5){
+      scrollPos = voiceTargetScroll;
+    } else {
+      scrollPos += diff * 0.15;
+    }
+    wrapEl.scrollTop = scrollPos;
+  } else if(playing){
     const speed = parseFloat(speedSlider.value) / 28;
     scrollPos += speed;
     wrapEl.scrollTop = scrollPos;
@@ -699,12 +708,12 @@ function showMicWarning(msg){
   setTimeout(()=>{ micWarningEl.style.display = 'none'; }, 6000);
 }
 
-function scrollWordToCenter(idx, smooth){
+let voiceTargetScroll = null; // desired scroll position from the latest voice match; null = not voice-driven yet
+
+function scrollWordToCenter(idx){
   if(idx < 0 || idx >= wordTops.length) return;
   const target = wordTops[idx] - wrapEl.clientHeight * 0.38;
-  const clamped = Math.max(target,0);
-  wrapEl.scrollTo({ top: clamped, behavior: smooth ? 'smooth' : 'auto' });
-  scrollPos = clamped;
+  voiceTargetScroll = Math.max(target, 0);
 }
 
 function handleSpokenWord(spoken){
@@ -716,7 +725,7 @@ function handleSpokenWord(spoken){
     if(normWords[i] === s){
       currentWordIdx = i;
       const leadIdx = Math.min(i + LEAD_WORDS, wordTops.length - 1);
-      scrollWordToCenter(leadIdx, false); // instant jump, not smooth-animated, to cut perceived lag
+      scrollWordToCenter(leadIdx);
       updateHighlightAndProgress();
       return;
     }
@@ -760,6 +769,7 @@ function startVoiceTracking(){
   try{
     recognition.start();
     voiceActive = true;
+    voiceTargetScroll = scrollPos; // start from current position, no initial jump
     voiceBtn.classList.add('listening');
     voiceBtn.textContent = "🎙️ Listening… (click to stop)";
     playBtn.disabled = true;
@@ -774,6 +784,7 @@ function startVoiceTracking(){
 
 function stopVoiceTracking(){
   voiceActive = false;
+  voiceTargetScroll = null;
   voiceBtn.classList.remove('listening');
   voiceBtn.textContent = "🎙️ Voice Tracking";
   playBtn.disabled = false;
