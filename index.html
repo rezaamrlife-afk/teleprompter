@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="fa">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NIR Academy — Teleprompter | Session 1</title>
+<title>NIR Academy — Teleprompter | Session 10</title>
 <style>
   :root{
     --bg:#0A0A0A;
@@ -98,9 +98,59 @@
     background:var(--gold);
     color:#0A0A0A;
   }
+  button:disabled{
+    opacity:.35;
+    cursor:not-allowed;
+  }
   #playBtn{
     min-width:90px;
     font-weight:bold;
+  }
+  #voiceBtn{
+    min-width:150px;
+    font-weight:bold;
+  }
+  #voiceBtn.listening{
+    background:#7a2e2e;
+    border-color:#c14b4b;
+    color:#fff;
+    animation:pulse 1.4s infinite;
+  }
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(193,75,75,0.5);}
+    70%{box-shadow:0 0 0 8px rgba(193,75,75,0);}
+    100%{box-shadow:0 0 0 0 rgba(193,75,75,0);}
+  }
+
+  /* ---- Progress bar ---- */
+  #progressBar{
+    height:4px;
+    background:#1c1a17;
+    flex-shrink:0;
+    position:relative;
+  }
+  #progressFill{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg, var(--gold-dim), var(--gold));
+    transition:width .15s linear;
+  }
+  #statsBar{
+    display:flex;
+    gap:18px;
+    padding:5px 20px;
+    background:var(--panel);
+    border-bottom:1px solid #262420;
+    font-family:Arial, Helvetica, sans-serif;
+    font-size:11px;
+    color:var(--text-dim);
+    letter-spacing:0.04em;
+    flex-shrink:0;
+    flex-wrap:wrap;
+  }
+  #statsBar b{
+    color:var(--gold);
+    font-weight:600;
   }
 
   /* ---- Prompter area ---- */
@@ -152,10 +202,18 @@
   p{
     margin:0 0 26px 0;
   }
-  #prompterText .fade-edge-top,
-  #prompterText .fade-edge-bottom{
-    display:none;
+  .sentence{
+    opacity:.5;
+    transition:opacity .25s ease, color .25s ease;
   }
+  .sentence.active-line{
+    opacity:1;
+    color:var(--gold);
+  }
+  .w{
+    display:inline;
+  }
+
   #fadeTop, #fadeBottom{
     position:absolute;
     left:0;right:0;
@@ -194,94 +252,41 @@
     pointer-events:none;
   }
 
-  ::-webkit-scrollbar{display:none;}
-
-  /* ---- Progress bar ---- */
-  #progressBar{
-    height:3px;
-    background:var(--gold);
-    width:0%;
-    transition:width .2s linear;
-    flex-shrink:0;
-  }
-
-  /* ---- Stats bar ---- */
-  #statsBar{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:28px;
-    padding:5px 20px;
-    background:var(--panel);
-    border-bottom:1px solid #1a1816;
+  #micWarning{
+    position:fixed;
+    top:70px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#3a2323;
+    border:1px solid #c14b4b;
+    color:#f2d9d9;
     font-family:Arial, sans-serif;
     font-size:12px;
-    color:var(--text-dim);
-    flex-shrink:0;
-    letter-spacing:0.05em;
-  }
-  #statsBar span b{
-    color:var(--gold);
-    font-weight:normal;
-  }
-
-  /* ---- Current line highlight ---- */
-  .line-active{
-    color:var(--gold) !important;
-    text-shadow:0 0 18px rgba(201,168,76,0.35);
-    transition:color .1s;
-  }
-  p, .section-label, .video-title{
-    transition:color .1s, opacity .1s;
-  }
-  #prompterText.highlight-on p,
-  #prompterText.highlight-on .section-label{
-    color:var(--text-dim);
-    opacity:0.45;
-  }
-  #prompterText.highlight-on .line-active{
-    color:var(--gold) !important;
-    opacity:1 !important;
-    text-shadow:0 0 18px rgba(201,168,76,0.35);
+    padding:10px 18px;
+    border-radius:6px;
+    z-index:20;
+    max-width:80vw;
+    text-align:center;
+    display:none;
   }
 
-  /* ---- Voice status badge ---- */
-  #voiceBadge{
-    font-family:Arial,sans-serif;
-    font-size:11px;
-    padding:3px 10px;
-    border-radius:12px;
-    border:1px solid var(--gold-dim);
-    color:var(--text-dim);
-    background:transparent;
-    transition:all .2s;
-    white-space:nowrap;
-  }
-  #voiceBadge.listening{
-    border-color:var(--gold);
-    color:var(--gold);
-    background:rgba(201,168,76,0.08);
-  }
-  #voiceBadge.active{
-    border-color:#4caf7d;
-    color:#4caf7d;
-    background:rgba(76,175,125,0.08);
-  }
+  ::-webkit-scrollbar{display:none;}
 </style>
 </head>
 <body>
 <div id="app">
   <div id="topbar">
-    <div id="brand"><span class="dot"></span> NIR Academy · Teleprompter · Session 1</div>
+    <div id="brand"><span class="dot"></span> NIR Academy · Teleprompter</div>
 
     <select id="videoSelect">
       <option value="all">All three videos</option>
-      <option value="v1">Video 1 — Language User vs Language Teacher</option>
-      <option value="v2">Video 2 — The Five Teacher Roles</option>
-      <option value="v3">Video 3 — Myths, Identity & Reflection</option>
+      <option value="v1">Video 1</option>
+      <option value="v2">Video 2</option>
+      <option value="v3">Video 3</option>
     </select>
 
     <div class="controls">
+      <button id="voiceBtn">🎙️ Voice Tracking</button>
       <div class="ctrl-group">
         Speed
         <input type="range" id="speedSlider" min="10" max="120" value="40">
@@ -291,18 +296,17 @@
         <input type="range" id="fontSlider" min="22" max="64" value="38">
       </div>
       <button id="mirrorBtn">Mirror</button>
-      <button id="highlightBtn">Highlight</button>
-      <button id="voiceBtn">🎤 Voice</button>
       <button id="resetBtn">Restart</button>
       <button id="playBtn">▶ Play</button>
     </div>
   </div>
-  <div id="progressBar"></div>
+
+  <div id="progressBar"><div id="progressFill"></div></div>
   <div id="statsBar">
-    <span>Progress: <b id="statPct">0%</b></span>
-    <span>Elapsed: <b id="statElapsed">0:00</b></span>
-    <span>Remaining: <b id="statRemain">—</b></span>
-    <span id="voiceBadge">🎤 Voice off</span>
+    <span><b id="progressPct">0%</b> complete</span>
+    <span>Elapsed <b id="elapsedTime">00:00</b></span>
+    <span>Remaining <b id="remainingTime">--:--</b></span>
+    <span id="paceInfo"></span>
   </div>
 
   <div id="prompterWrap">
@@ -310,11 +314,13 @@
     <div id="prompterText"></div>
     <div id="centerLine"></div>
     <div id="fadeBottom"></div>
-    <div id="hint">Space = play/pause · Up/Down arrows = adjust speed · Mouse scroll also works</div>
+    <div id="hint">Space = play/pause · Up/Down arrows = adjust speed · Mouse scroll also works · Voice Tracking overrides manual scroll</div>
+    <div id="micWarning"></div>
   </div>
 </div>
 
 <script>
+/* ===================== SCRIPT CONTENT ===================== */
 const content = {
   v1: {
     title: "Video 1 — Language User vs Language Teacher",
@@ -428,22 +434,7 @@ const content = {
   }
 };
 
-function buildHTML(key){
-  const keys = key === "all" ? ["v1","v2","v3"] : [key];
-  let html = "";
-  keys.forEach(k=>{
-    const vid = content[k];
-    html += `<div class="video-title">${vid.title}</div>`;
-    vid.paragraphs.forEach(p=>{
-      if(typeof p === "object" && p.type === "section"){
-        html += `<div class="section-label">${p.text}</div>`;
-      } else {
-        html += `<p>${p}</p>`;
-      }
-    });
-  });
-  return html;
-}
+/* ============================================================ */
 
 const textEl = document.getElementById('prompterText');
 const wrapEl = document.getElementById('prompterWrap');
@@ -452,355 +443,343 @@ const speedSlider = document.getElementById('speedSlider');
 const fontSlider = document.getElementById('fontSlider');
 const playBtn = document.getElementById('playBtn');
 const mirrorBtn = document.getElementById('mirrorBtn');
-const highlightBtn = document.getElementById('highlightBtn');
-const voiceBtn = document.getElementById('voiceBtn');
 const resetBtn = document.getElementById('resetBtn');
 const hintEl = document.getElementById('hint');
-const progressBarEl = document.getElementById('progressBar');
-const statPct = document.getElementById('statPct');
-const statElapsed = document.getElementById('statElapsed');
-const statRemain = document.getElementById('statRemain');
-const voiceBadge = document.getElementById('voiceBadge');
+const voiceBtn = document.getElementById('voiceBtn');
+const progressFill = document.getElementById('progressFill');
+const progressPct = document.getElementById('progressPct');
+const elapsedTimeEl = document.getElementById('elapsedTime');
+const remainingTimeEl = document.getElementById('remainingTime');
+const paceInfoEl = document.getElementById('paceInfo');
+const micWarningEl = document.getElementById('micWarning');
 
-setTimeout(()=>{ hintEl.classList.add('faded'); }, 6000);
+setTimeout(()=>{ hintEl.classList.add('faded'); }, 7000);
 
 let playing = false;
-let highlightOn = false;
-let startTime = null;
-let elapsedAtPause = 0;
+let mirrored = false;
 
-// ── Highlight current line ──────────────────────────────────────────
-function updateHighlight(){
-  if(!highlightOn) return;
-  const centerY = wrapEl.getBoundingClientRect().top + wrapEl.clientHeight * 0.38;
-  let closest = null, closestDist = Infinity;
-  textEl.querySelectorAll('p, .section-label').forEach(el=>{
-    el.classList.remove('line-active');
-    const r = el.getBoundingClientRect();
-    const mid = r.top + r.height / 2;
-    const dist = Math.abs(mid - centerY);
-    if(dist < closestDist){ closestDist = dist; closest = el; }
-  });
-  if(closest) closest.classList.add('line-active');
+/* word / sentence index structures, rebuilt on every render() */
+let wordEls = [];      // ordered array of <span class="w"> elements
+let normWords = [];    // normalized text for each word, same order
+let wordTops = [];     // cached offsetTop (relative to #prompterText) for each word
+let sentenceOfWord = []; // sentence element for each word index
+let totalWords = 0;
+let currentWordIdx = -1;
+let activeSentenceEl = null;
+
+function escapeHtml(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function norm(s){
+  return s.toLowerCase().replace(/[^a-z0-9']/g,'');
 }
 
-// ── Progress + time ─────────────────────────────────────────────────
-function fmt(sec){
-  const m = Math.floor(sec/60), s = Math.floor(sec%60);
-  return m+':'+(s<10?'0':'')+s;
-}
-function updateProgress(){
-  const max = wrapEl.scrollHeight - wrapEl.clientHeight;
-  const pct = max > 0 ? wrapEl.scrollTop / max : 0;
-  progressBarEl.style.width = (pct*100).toFixed(1)+'%';
-  statPct.textContent = Math.round(pct*100)+'%';
-  const now = Date.now();
-  const elapsed = playing && startTime ? elapsedAtPause + (now - startTime)/1000 : elapsedAtPause;
-  statElapsed.textContent = fmt(elapsed);
-  if(pct > 0.001){
-    const total = elapsed / pct;
-    const remain = Math.max(0, total - elapsed);
-    statRemain.textContent = fmt(remain);
-  } else {
-    statRemain.textContent = '—';
-  }
-}
-
-// ── Voice tracking — transcript alignment ──────────────────────────
-let recognition = null;
-let voiceActive = false;
-
-// Flat word list extracted from prompter content
-let scriptWords = [];   // [{word, paraIdx, wordIdx}]
-let alignCursor = 0;    // index into scriptWords of next expected word
-let voiceScrollTarget = null; // null = no override; number = target scrollTop
-let voiceSpeaking = false;
-
-function normalizeWord(w){
-  return w.toLowerCase().replace(/[^a-z0-9']/g, '');
-}
-
-function buildScriptWords(){
-  scriptWords = [];
-  textEl.querySelectorAll('p').forEach((el, pi)=>{
-    const words = el.textContent.trim().split(/\s+/);
-    words.forEach((w, wi)=>{
-      const n = normalizeWord(w);
-      if(n) scriptWords.push({norm:n, el, pi, wi});
+function buildHTML(key){
+  const keys = key === "all" ? ["v1","v2","v3"] : [key];
+  let html = "";
+  keys.forEach(k=>{
+    const vid = content[k];
+    html += `<div class="video-title">${escapeHtml(vid.title)}</div>`;
+    vid.paragraphs.forEach(p=>{
+      if(typeof p === "object" && p.type === "section"){
+        html += `<div class="section-label">${escapeHtml(p.text)}</div>`;
+      } else {
+        const sentences = p.match(/[^.!?]+[.!?]*(\s+|$)/g) || [p];
+        html += `<p>`;
+        sentences.forEach(sent=>{
+          const trimmed = sent.trim();
+          if(!trimmed) return;
+          const words = trimmed.split(/\s+/);
+          const wordsHtml = words.map(w=>{
+            return `<span class="w">${escapeHtml(w)}</span>`;
+          }).join(' ');
+          html += `<span class="sentence">${wordsHtml}</span> `;
+        });
+        html += `</p>`;
+      }
     });
   });
-  alignCursor = 0;
-  voiceScrollTarget = null;
+  return html;
 }
 
-// Try to match a transcript string against scriptWords starting near alignCursor.
-// Returns the index of the last matched word, or -1 if no match.
-function matchTranscript(transcript){
-  const spoken = transcript.trim().split(/\s+/).map(normalizeWord).filter(Boolean);
-  if(!spoken.length) return -1;
+function render(){
+  textEl.innerHTML = buildHTML(videoSelect.value);
+  wrapEl.scrollTop = 0;
+  indexWords();
+  recalcTops();
+  resetProgressState();
+}
 
-  // Search window: look ahead up to 80 words from cursor (handles skips/restarts)
-  const searchStart = Math.max(0, alignCursor - 5);
-  const searchEnd   = Math.min(scriptWords.length - spoken.length, alignCursor + 80);
+function indexWords(){
+  wordEls = Array.from(textEl.querySelectorAll('.w'));
+  sentenceOfWord = wordEls.map(el => el.closest('.sentence'));
+  normWords = wordEls.map(el => norm(el.textContent));
+  totalWords = wordEls.length;
+}
 
-  let bestIdx = -1, bestScore = 0;
+function recalcTops(){
+  wordTops = wordEls.map(el => el.offsetTop);
+}
 
-  for(let i = searchStart; i <= searchEnd; i++){
-    let matches = 0;
-    for(let j = 0; j < spoken.length && i+j < scriptWords.length; j++){
-      if(scriptWords[i+j].norm === spoken[j]) matches++;
+/* ---- geometry based "current line" detection (works for both auto-scroll and voice mode) ---- */
+function findNearestWordIndex(){
+  if(wordTops.length === 0) return -1;
+  const centerY = wrapEl.scrollTop + wrapEl.clientHeight * 0.38;
+  // binary search for first wordTop >= centerY
+  let lo = 0, hi = wordTops.length - 1, ans = wordTops.length - 1;
+  while(lo <= hi){
+    const mid = (lo + hi) >> 1;
+    if(wordTops[mid] >= centerY){
+      ans = mid; hi = mid - 1;
+    } else {
+      lo = mid + 1;
     }
-    const score = matches / spoken.length;
-    if(score > bestScore && score >= 0.5){
-      bestScore = score;
-      bestIdx = i + spoken.length - 1; // last matched word position
+  }
+  return ans;
+}
+
+function updateHighlightAndProgress(){
+  const idx = findNearestWordIndex();
+  if(idx !== currentWordIdx && idx >= 0){
+    currentWordIdx = idx;
+    const sEl = sentenceOfWord[idx];
+    if(sEl !== activeSentenceEl){
+      if(activeSentenceEl) activeSentenceEl.classList.remove('active-line');
+      if(sEl) sEl.classList.add('active-line');
+      activeSentenceEl = sEl;
     }
   }
-  return bestIdx;
+  updateProgressUI();
 }
 
-function scrollToWord(wordIdx){
-  const entry = scriptWords[wordIdx];
-  if(!entry) return;
-  const elRect = entry.el.getBoundingClientRect();
-  const wrapRect = wrapEl.getBoundingClientRect();
-  // Target: matched paragraph sits at 38% from top (center line)
-  const target = wrapEl.scrollTop + (elRect.top - wrapRect.top) - wrapEl.clientHeight * 0.38;
-  voiceScrollTarget = Math.max(0, target);
+/* ---- progress + time ---- */
+let sessionStartTime = null;
+let startWordIdx = 0;
+
+function resetProgressState(){
+  sessionStartTime = null;
+  startWordIdx = 0;
+  currentWordIdx = -1;
+  if(activeSentenceEl){ activeSentenceEl.classList.remove('active-line'); activeSentenceEl = null; }
+  updateProgressUI();
 }
 
-// ── UI state helpers ────────────────────────────────────────────────
-function setManualMode(){
-  // Voice off → enable Play + Speed
-  playBtn.disabled = false;
-  playBtn.style.opacity = '';
-  speedSlider.disabled = false;
-  speedSlider.style.opacity = '';
+function fmtTime(sec){
+  if(!isFinite(sec) || sec < 0) return "--:--";
+  sec = Math.round(sec);
+  const m = Math.floor(sec/60);
+  const s = sec%60;
+  return String(m).padStart(2,'0') + ":" + String(s).padStart(2,'0');
 }
 
-function setVoiceMode(){
-  // Voice on → disable Play + Speed, stop any manual playback
-  if(playing){
-    elapsedAtPause += (Date.now() - startTime) / 1000;
-    startTime = null;
-    playing = false;
-  }
-  playBtn.textContent = "▶ Play";
-  playBtn.disabled = true;
-  playBtn.style.opacity = '0.35';
-  speedSlider.disabled = true;
-  speedSlider.style.opacity = '0.35';
-}
+function updateProgressUI(){
+  const idx = Math.max(currentWordIdx, 0);
+  const pct = totalWords > 0 ? Math.min(100, Math.round((idx/totalWords)*100)) : 0;
+  progressFill.style.width = pct + "%";
+  progressPct.textContent = pct + "%";
 
-// ── Voice mode ──────────────────────────────────────────────────────
-const SILENCE_STOP_MS = 7000; // 7 s silence → stop scroll
-let _silenceTimer = null;
-
-function onSpeechDetected(transcript){
-  voiceSpeaking = true;
-  clearTimeout(_silenceTimer);
-  _silenceTimer = setTimeout(()=>{
-    voiceSpeaking = false;
-    voiceScrollTarget = null;
-    voiceBadge.textContent = '🎤 Listening…';
-    voiceBadge.className = 'listening';
-  }, SILENCE_STOP_MS);
-
-  const matchedIdx = matchTranscript(transcript);
-  if(matchedIdx !== -1 && matchedIdx >= alignCursor){
-    alignCursor = matchedIdx + 1;
-    scrollToWord(matchedIdx);
-    voiceBadge.textContent = '🗣 Speaking';
-    voiceBadge.className = 'active';
-  } else {
-    voiceScrollTarget = null; // no jump — let baseline speed carry
-    voiceBadge.textContent = '🗣 Speaking';
-    voiceBadge.className = 'active';
-  }
-}
-
-function startVoice(){
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if(!SR){
-    alert('متأسفانه مرورگر شما Web Speech API را پشتیبانی نمی‌کند.\nلطفاً از Chrome استفاده کنید.');
+  if(sessionStartTime === null){
+    elapsedTimeEl.textContent = "00:00";
+    remainingTimeEl.textContent = "--:--";
+    paceInfoEl.textContent = "";
     return;
   }
-  buildScriptWords();
-  setVoiceMode();
+
+  const elapsedSec = (Date.now() - sessionStartTime) / 1000;
+  elapsedTimeEl.textContent = fmtTime(elapsedSec);
+
+  const wordsCovered = idx - startWordIdx;
+  const DEFAULT_WPS = 2.3; // ~140 wpm fallback until we have real data
+  let wps = DEFAULT_WPS;
+  if(wordsCovered > 8 && elapsedSec > 3){
+    wps = wordsCovered / elapsedSec;
+    paceInfoEl.textContent = "Pace ~" + Math.round(wps*60) + " wpm";
+  } else {
+    paceInfoEl.textContent = "";
+  }
+  const remainingWords = Math.max(totalWords - idx, 0);
+  const remainingSec = remainingWords / wps;
+  remainingTimeEl.textContent = fmtTime(remainingSec);
+}
+
+/* ---- Auto-scroll (manual) mode ---- */
+function tick(){
+  if(playing){
+    const speed = parseFloat(speedSlider.value) / 12;
+    wrapEl.scrollTop += speed;
+    if(wrapEl.scrollTop >= wrapEl.scrollHeight - wrapEl.clientHeight){
+      playing = false;
+      playBtn.textContent = "▶ Play";
+    }
+  }
+  updateHighlightAndProgress();
+  requestAnimationFrame(tick);
+}
+
+playBtn.addEventListener('click', ()=>{
+  if(voiceActive) return; // voice mode owns scrolling
+  playing = !playing;
+  playBtn.textContent = playing ? "⏸ Pause" : "▶ Play";
+  hintEl.classList.add('faded');
+  if(playing && sessionStartTime === null){
+    sessionStartTime = Date.now();
+    startWordIdx = Math.max(currentWordIdx, 0);
+  }
+});
+
+resetBtn.addEventListener('click', ()=>{
+  wrapEl.scrollTop = 0;
+  playing = false;
+  playBtn.textContent = "▶ Play";
+  resetProgressState();
+});
+
+mirrorBtn.addEventListener('click', ()=>{
+  mirrored = !mirrored;
+  textEl.classList.toggle('mirror', mirrored);
+  mirrorBtn.classList.toggle('active', mirrored);
+});
+
+fontSlider.addEventListener('input', ()=>{
+  textEl.style.fontSize = fontSlider.value + "px";
+  requestAnimationFrame(recalcTops);
+});
+
+videoSelect.addEventListener('change', ()=>{
+  stopVoiceTracking();
+  render();
+});
+
+document.addEventListener('keydown', (e)=>{
+  if(e.code === 'Space'){
+    e.preventDefault();
+    if(voiceActive) return;
+    playing = !playing;
+    playBtn.textContent = playing ? "⏸ Pause" : "▶ Play";
+    if(playing && sessionStartTime === null){
+      sessionStartTime = Date.now();
+      startWordIdx = Math.max(currentWordIdx, 0);
+    }
+  } else if(e.code === 'ArrowUp'){
+    speedSlider.value = Math.min(120, parseInt(speedSlider.value)+5);
+  } else if(e.code === 'ArrowDown'){
+    speedSlider.value = Math.max(10, parseInt(speedSlider.value)-5);
+  }
+});
+
+wrapEl.addEventListener('wheel', (e)=>{
+  if(voiceActive) return;
+  wrapEl.scrollTop += e.deltaY;
+}, {passive:true});
+
+window.addEventListener('resize', ()=>{ requestAnimationFrame(recalcTops); });
+
+/* ===================== VOICE TRACKING ===================== */
+let recognition = null;
+let voiceActive = false;
+const LOOKAHEAD = 22;       // how many words ahead we search for a match
+const LEAD_WORDS = 5;       // compensate for ~0.5-1.5s speech-recognition network latency
+
+function showMicWarning(msg){
+  micWarningEl.textContent = msg;
+  micWarningEl.style.display = 'block';
+  setTimeout(()=>{ micWarningEl.style.display = 'none'; }, 6000);
+}
+
+function scrollWordToCenter(idx, smooth){
+  if(idx < 0 || idx >= wordTops.length) return;
+  const target = wordTops[idx] - wrapEl.clientHeight * 0.38;
+  wrapEl.scrollTo({ top: Math.max(target,0), behavior: smooth ? 'smooth' : 'auto' });
+}
+
+function handleSpokenWord(spoken){
+  const s = norm(spoken);
+  if(!s) return;
+  const start = Math.max(currentWordIdx, 0);
+  const end = Math.min(start + LOOKAHEAD, normWords.length);
+  for(let i = start; i < end; i++){
+    if(normWords[i] === s){
+      currentWordIdx = i;
+      const leadIdx = Math.min(i + LEAD_WORDS, wordTops.length - 1);
+      scrollWordToCenter(leadIdx, false); // instant jump, not smooth-animated, to cut perceived lag
+      updateHighlightAndProgress();
+      return;
+    }
+  }
+}
+
+function startVoiceTracking(){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){
+    showMicWarning("Voice Tracking needs Chrome or Edge (Web Speech API not available in this browser). Falling back to manual scroll.");
+    return;
+  }
+  playing = false;
+  playBtn.textContent = "▶ Play";
 
   recognition = new SR();
   recognition.continuous = true;
   recognition.interimResults = true;
   recognition.lang = 'en-US';
 
-  recognition.onstart = ()=>{
-    voiceActive = true;
-    voiceSpeaking = false;
-    voiceBadge.textContent = '🎤 Listening…';
-    voiceBadge.className = 'listening';
-    voiceBtn.classList.add('active');
-    voiceBtn.textContent = '🎤 Voice ON';
-  };
-
-  recognition.onresult = (e)=>{
-    let interim = '', final = '';
-    for(let i = e.resultIndex; i < e.results.length; i++){
-      const t = e.results[i][0].transcript;
-      if(e.results[i].isFinal) final += t + ' ';
-      else interim += t;
+  recognition.onresult = (event)=>{
+    for(let r = event.resultIndex; r < event.results.length; r++){
+      const transcript = event.results[r][0].transcript;
+      const words = transcript.trim().split(/\s+/);
+      words.forEach(handleSpokenWord);
     }
-    const transcript = (final || interim).trim();
-    if(transcript) onSpeechDetected(transcript);
   };
-
   recognition.onerror = (e)=>{
-    if(e.error === 'not-allowed'){
-      alert('میکروفون دسترسی ندارد. لطفاً مجوز میکروفون را در مرورگر فعال کنید.');
-      stopVoice();
+    if(e.error === 'not-allowed' || e.error === 'service-not-allowed'){
+      showMicWarning("Microphone access was blocked. Allow mic permission and try again. Note: opening this file directly (file://) may block mic access — serve it from a local server or web host instead.");
+      stopVoiceTracking();
     }
-    // other errors (network, aborted): onend will auto-restart
+    // other errors (no-speech, network) - let onend restart it
   };
-
   recognition.onend = ()=>{
-    // Auto-reconnect as long as voice mode is active
     if(voiceActive){
-      try { recognition.start(); } catch(_){}
+      try{ recognition.start(); } catch(e){}
     }
   };
 
-  recognition.start();
+  try{
+    recognition.start();
+    voiceActive = true;
+    voiceBtn.classList.add('listening');
+    voiceBtn.textContent = "🎙️ Listening… (click to stop)";
+    playBtn.disabled = true;
+    if(sessionStartTime === null){
+      sessionStartTime = Date.now();
+      startWordIdx = Math.max(currentWordIdx, 0);
+    }
+  } catch(e){
+    showMicWarning("Could not start voice tracking: " + e.message);
+  }
 }
 
-function stopVoice(){
+function stopVoiceTracking(){
   voiceActive = false;
-  voiceSpeaking = false;
-  voiceScrollTarget = null;
-  clearTimeout(_silenceTimer);
-  if(recognition){ try{ recognition.stop(); }catch(_){} }
-  voiceBadge.textContent = '🎤 Voice off';
-  voiceBadge.className = '';
-  voiceBtn.classList.remove('active');
-  voiceBtn.textContent = '🎤 Voice';
-  setManualMode();
+  voiceBtn.classList.remove('listening');
+  voiceBtn.textContent = "🎙️ Voice Tracking";
+  playBtn.disabled = false;
+  if(recognition){
+    try{ recognition.onend = null; recognition.stop(); } catch(e){}
+    recognition = null;
+  }
 }
-
-// ── Main loop ───────────────────────────────────────────────────────
-// Baseline scroll speed in voice mode (matches Speed slider midpoint feel)
-const VOICE_BASE_SPEED = 40;
-
-function tick(){
-  if(voiceActive){
-    // Voice mode — fully independent of `playing`
-    if(voiceSpeaking && voiceScrollTarget !== null){
-      const diff = voiceScrollTarget - wrapEl.scrollTop;
-      if(Math.abs(diff) > 1){
-        wrapEl.scrollTop += diff * 0.07;
-      } else {
-        voiceScrollTarget = null;
-      }
-    }
-    // No target or silent → do not scroll
-  } else if(playing){
-    // Manual mode
-    wrapEl.scrollTop += parseFloat(speedSlider.value) / 12;
-    if(wrapEl.scrollTop >= wrapEl.scrollHeight - wrapEl.clientHeight){
-      playing = false;
-      elapsedAtPause += (Date.now() - startTime) / 1000;
-      startTime = null;
-      playBtn.textContent = "▶ Play";
-    }
-  }
-  updateHighlight();
-  updateProgress();
-  requestAnimationFrame(tick);
-}
-
-// ── Controls ────────────────────────────────────────────────────────
-function render(){
-  textEl.innerHTML = buildHTML(videoSelect.value);
-  wrapEl.scrollTop = 0;
-  elapsedAtPause = 0;
-  startTime = null;
-  playing = false;
-  playBtn.textContent = "▶ Play";
-  voiceScrollTarget = null;
-  alignCursor = 0;
-  voiceSpeaking = false;
-  clearTimeout(_silenceTimer);
-  if(voiceActive) buildScriptWords();
-}
-
-playBtn.addEventListener('click', ()=>{
-  if(voiceActive) return; // disabled in voice mode
-  playing = !playing;
-  if(playing){
-    startTime = Date.now();
-    playBtn.textContent = "⏸ Pause";
-  } else {
-    elapsedAtPause += (Date.now() - startTime) / 1000;
-    startTime = null;
-    playBtn.textContent = "▶ Play";
-  }
-  hintEl.classList.add('faded');
-});
-
-resetBtn.addEventListener('click', ()=>{
-  wrapEl.scrollTop = 0;
-  playing = false;
-  elapsedAtPause = 0;
-  startTime = null;
-  playBtn.textContent = "▶ Play";
-  voiceSpeaking = false;
-  voiceScrollTarget = null;
-  alignCursor = 0;
-  clearTimeout(_silenceTimer);
-  if(voiceActive){
-    voiceBadge.textContent = '🎤 Listening…';
-    voiceBadge.className = 'listening';
-  }
-});
-
-mirrorBtn.addEventListener('click', ()=>{
-  textEl.classList.toggle('mirror');
-  mirrorBtn.classList.toggle('active');
-});
-
-highlightBtn.addEventListener('click', ()=>{
-  highlightOn = !highlightOn;
-  textEl.classList.toggle('highlight-on', highlightOn);
-  highlightBtn.classList.toggle('active', highlightOn);
-  if(!highlightOn){
-    textEl.querySelectorAll('.line-active').forEach(el=>el.classList.remove('line-active'));
-  }
-});
 
 voiceBtn.addEventListener('click', ()=>{
-  voiceActive ? stopVoice() : startVoice();
-});
-
-fontSlider.addEventListener('input', ()=>{
-  textEl.style.fontSize = fontSlider.value + "px";
-});
-
-videoSelect.addEventListener('change', render);
-
-document.addEventListener('keydown', (e)=>{
-  if(e.code === 'Space' && !voiceActive){
-    e.preventDefault();
-    playBtn.click();
-  } else if(e.code === 'ArrowUp' && !voiceActive){
-    speedSlider.value = Math.min(120, parseInt(speedSlider.value) + 5);
-  } else if(e.code === 'ArrowDown' && !voiceActive){
-    speedSlider.value = Math.max(10, parseInt(speedSlider.value) - 5);
+  if(voiceActive){
+    stopVoiceTracking();
+  } else {
+    hintEl.classList.add('faded');
+    startVoiceTracking();
   }
 });
 
-wrapEl.addEventListener('wheel', (e)=>{
-  wrapEl.scrollTop += e.deltaY;
-}, {passive:true});
-
+/* ===================== INIT ===================== */
 render();
-tick();
+requestAnimationFrame(tick);
 </script>
 </body>
 </html>
