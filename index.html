@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NIR Academy — Teleprompter | Session 1</title>
+<style>
+  :root{
+    --bg:#0A0A0A;
+    --gold:#C9A84C;
+    --gold-dim:#8f7635;
+    --text:#F2EFE7;
+    --text-dim:#9c9890;
+    --panel:#151412;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;padding:0;height:100%;
+    background:var(--bg);
+    font-family:Georgia, 'Times New Roman', serif;
+    color:var(--text);
+    overflow:hidden;
+  }
+  #app{
+    display:flex;
+    flex-direction:column;
+    height:100vh;
+  }
+
+  /* ---- Top bar ---- */
+  #topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px 20px;
+    background:var(--panel);
+    border-bottom:1px solid #262420;
+    flex-shrink:0;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  #brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:14px;
+    letter-spacing:0.08em;
+    color:var(--gold);
+    text-transform:uppercase;
+  }
+  #brand .dot{
+    width:8px;height:8px;border-radius:50%;
+    background:var(--gold);
+  }
+  #videoSelect{
+    background:#0A0A0A;
+    color:var(--text);
+    border:1px solid var(--gold-dim);
+    padding:6px 10px;
+    border-radius:4px;
+    font-family:Georgia, serif;
+    font-size:13px;
+  }
+  .controls{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    flex-wrap:wrap;
+  }
+  .ctrl-group{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:12px;
+    color:var(--text-dim);
+  }
+  input[type=range]{
+    accent-color:var(--gold);
+    width:100px;
+  }
+  button{
+    background:transparent;
+    border:1px solid var(--gold-dim);
+    color:var(--gold);
+    padding:8px 16px;
+    border-radius:4px;
+    font-family:Georgia, serif;
+    font-size:13px;
+    cursor:pointer;
+    letter-spacing:0.03em;
+    transition:all .15s ease;
+  }
+  button:hover{
+    background:var(--gold);
+    color:#0A0A0A;
+  }
+  button.active{
+    background:var(--gold);
+    color:#0A0A0A;
+  }
+  #playBtn{
+    min-width:90px;
+    font-weight:bold;
+  }
+
+  /* ---- Prompter area ---- */
+  #prompterWrap{
+    flex:1;
+    position:relative;
+    overflow:hidden;
+  }
+  #centerLine{
+    position:absolute;
+    top:38%;
+    left:0;right:0;
+    height:1px;
+    background:linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+    z-index:2;
+    pointer-events:none;
+  }
+  #prompterText{
+    position:relative;
+    padding:45vh 8vw 60vh 8vw;
+    font-size:38px;
+    line-height:1.75;
+    color:var(--text);
+    will-change:transform;
+    transition:transform .05s linear;
+  }
+  #prompterText.mirror{
+    transform:scaleX(-1);
+  }
+  .video-title{
+    color:var(--gold);
+    font-size:0.55em;
+    text-transform:uppercase;
+    letter-spacing:0.12em;
+    margin:70px 0 30px 0;
+    border-bottom:1px solid var(--gold-dim);
+    padding-bottom:14px;
+  }
+  .video-title:first-child{
+    margin-top:0;
+  }
+  .section-label{
+    color:var(--gold-dim);
+    font-size:0.45em;
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+    margin:36px 0 10px 0;
+  }
+  p{
+    margin:0 0 26px 0;
+  }
+  #prompterText .fade-edge-top,
+  #prompterText .fade-edge-bottom{
+    display:none;
+  }
+  #fadeTop, #fadeBottom{
+    position:absolute;
+    left:0;right:0;
+    height:15vh;
+    z-index:3;
+    pointer-events:none;
+  }
+  #fadeTop{
+    top:0;
+    background:linear-gradient(to bottom, var(--bg), transparent);
+  }
+  #fadeBottom{
+    bottom:0;
+    background:linear-gradient(to top, var(--bg), transparent);
+  }
+
+  #hint{
+    position:fixed;
+    bottom:14px;
+    left:50%;
+    transform:translateX(-50%);
+    font-family:Arial, sans-serif;
+    font-size:11px;
+    color:var(--text-dim);
+    z-index:10;
+    letter-spacing:0.05em;
+    background:rgba(10,10,10,0.85);
+    border:1px solid #262420;
+    padding:6px 14px;
+    border-radius:20px;
+    white-space:nowrap;
+    transition:opacity .4s ease;
+  }
+  #hint.faded{
+    opacity:0;
+    pointer-events:none;
+  }
+
+  ::-webkit-scrollbar{display:none;}
+
+  /* ---- Progress bar ---- */
+  #progressBar{
+    height:3px;
+    background:var(--gold);
+    width:0%;
+    transition:width .2s linear;
+    flex-shrink:0;
+  }
+
+  /* ---- Stats bar ---- */
+  #statsBar{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:28px;
+    padding:5px 20px;
+    background:var(--panel);
+    border-bottom:1px solid #1a1816;
+    font-family:Arial, sans-serif;
+    font-size:12px;
+    color:var(--text-dim);
+    flex-shrink:0;
+    letter-spacing:0.05em;
+  }
+  #statsBar span b{
+    color:var(--gold);
+    font-weight:normal;
+  }
+
+  /* ---- Current line highlight ---- */
+  .line-active{
+    color:var(--gold) !important;
+    text-shadow:0 0 18px rgba(201,168,76,0.35);
+    transition:color .1s;
+  }
+  p, .section-label, .video-title{
+    transition:color .1s, opacity .1s;
+  }
+  #prompterText.highlight-on p,
+  #prompterText.highlight-on .section-label{
+    color:var(--text-dim);
+    opacity:0.45;
+  }
+  #prompterText.highlight-on .line-active{
+    color:var(--gold) !important;
+    opacity:1 !important;
+    text-shadow:0 0 18px rgba(201,168,76,0.35);
+  }
+
+  /* ---- Voice status badge ---- */
+  #voiceBadge{
+    font-family:Arial,sans-serif;
+    font-size:11px;
+    padding:3px 10px;
+    border-radius:12px;
+    border:1px solid var(--gold-dim);
+    color:var(--text-dim);
+    background:transparent;
+    transition:all .2s;
+    white-space:nowrap;
+  }
+  #voiceBadge.listening{
+    border-color:var(--gold);
+    color:var(--gold);
+    background:rgba(201,168,76,0.08);
+  }
+  #voiceBadge.active{
+    border-color:#4caf7d;
+    color:#4caf7d;
+    background:rgba(76,175,125,0.08);
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="topbar">
+    <div id="brand"><span class="dot"></span> NIR Academy · Teleprompter · Session 1</div>
+
+    <select id="videoSelect">
+      <option value="all">All three videos</option>
+      <option value="v1">Video 1 — Language User vs Language Teacher</option>
+      <option value="v2">Video 2 — The Five Teacher Roles</option>
+      <option value="v3">Video 3 — Myths, Identity & Reflection</option>
+    </select>
+
+    <div class="controls">
+      <div class="ctrl-group">
+        Speed
+        <input type="range" id="speedSlider" min="10" max="120" value="40">
+      </div>
+      <div class="ctrl-group">
+        Font size
+        <input type="range" id="fontSlider" min="22" max="64" value="38">
+      </div>
+      <button id="mirrorBtn">Mirror</button>
+      <button id="highlightBtn">Highlight</button>
+      <button id="voiceBtn">🎤 Voice</button>
+      <button id="resetBtn">Restart</button>
+      <button id="playBtn">▶ Play</button>
+    </div>
+  </div>
+  <div id="progressBar"></div>
+  <div id="statsBar">
+    <span>Progress: <b id="statPct">0%</b></span>
+    <span>Elapsed: <b id="statElapsed">0:00</b></span>
+    <span>Remaining: <b id="statRemain">—</b></span>
+    <span id="voiceBadge">🎤 Voice off</span>
+  </div>
+
+  <div id="prompterWrap">
+    <div id="fadeTop"></div>
+    <div id="prompterText"></div>
+    <div id="centerLine"></div>
+    <div id="fadeBottom"></div>
+    <div id="hint">Space = play/pause · Up/Down arrows = adjust speed · Mouse scroll also works</div>
+  </div>
+</div>
+
+<script>
+const content = {
+  v1: {
+    title: "Video 1 — Language User vs Language Teacher",
+    paragraphs: [
+      {type:"section", text:"Opening"},
+      "Welcome to Session One of AITTC — the AI-Powered English Teacher Training Course.",
+      "My name is Dr. Niki Majidi. In this first video, we're going to explore the most fundamental question in this entire course:",
+      "What is the difference between someone who speaks English — and someone who teaches it?",
+      "Before I answer that — I want you to do something. Think of the best teacher you ever had. Any subject. Any age. Just picture them for a moment.",
+      "Now — what made them great? In my experience, after asking this question to thousands of trainee teachers, nobody ever says: 'their grammar was perfect' or 'they had a native accent.' What people remember is how that teacher made them feel. And that tells us something very important about what teaching actually is.",
+
+      {type:"section", text:"Language User vs Language Teacher"},
+      "Here is the most common misconception in English language education: if you speak English well, you can teach it.",
+      "Think about it this way. You can drive a car — but that doesn't make you a driving instructor. You can cook — but that doesn't make you a chef who can train others. The same logic applies to English.",
+      "A language user communicates effectively in English. Fluency, vocabulary, a good accent — these are real strengths.",
+      "But a language teacher is a professional who has developed specialised knowledge and tools to help others acquire a language. As the researcher Shulman showed in 1987, this requires what he called pedagogical content knowledge — not just knowing English, but knowing how to make English learnable for others. That distinction is everything.",
+      "A professional language teacher understands how language is structured — grammar, vocabulary, pronunciation.",
+      "They understand how people learn second languages — what researchers call Second Language Acquisition theory.",
+      "They can anticipate the difficulties their learners will face before those difficulties arise.",
+      "And they can respond flexibly when things don't go to plan — which, in teaching, is most of the time.",
+      "Here's a finding that surprises many people. Andrews, in 2007, found that teachers with high metalinguistic awareness — the ability to think analytically about language — were consistently rated more effective than teachers with high fluency but low analytical awareness. Understanding how English works matters more than how naturally you speak it.",
+
+      {type:"section", text:"Research Spotlight"},
+      "I want to share two pieces of research that shape everything we do in AITTC.",
+      "First: Medgyes, in 1992, conducted a landmark study showing that non-native English-speaking teachers frequently outperform native speakers in grammatical explanation, learner empathy, and metalinguistic awareness. Why? Because a non-native teacher has walked the road their learners are walking. That shared experience is not a weakness — it is a professional advantage.",
+      "Second: Cook, in 1999, introduced the concept of the multi-competent speaker — a bilingual or multilingual teacher who brings a richer understanding of language acquisition than a monolingual native speaker can offer.",
+      "Together, these studies challenge what Phillipson called the native speaker fallacy — the assumption that native speakers make inherently superior teachers. The research says otherwise. Your accent does not determine your effectiveness. Your professional knowledge and skills do.",
+
+      {type:"section", text:"Close of Video 1"},
+      "In this video, we've established the core distinction: knowing English and teaching English are two different professional competencies.",
+      "In Video 2, we're going to look at the five professional roles that every effective language teacher must develop — and how expert teachers move between them within a single lesson.",
+      "Before you move on, complete the pause task in your Handbook if you haven't already. Then come back for Video 2."
+    ]
+  },
+  v2: {
+    title: "Video 2 — The Five Teacher Roles",
+    paragraphs: [
+      {type:"section", text:"Opening"},
+      "Welcome back. In Video 1, we established that teaching is a profession — not just a skill. In this video, we're going to look at what professional teachers actually do: the five roles they move between in every lesson.",
+      "Research by Harmer in 2007 — and extended by Scrivener in 2011 — identifies five essential roles. And here's the key: expert teachers don't stay in one role. They shift between all five — sometimes within the same five minutes. Let's look at each one.",
+
+      {type:"section", text:"Role 1 — Instructor"},
+      "The first role is the Instructor. This is the role most new teachers default to — and it's important. As an Instructor, you present new language clearly and accurately at the right level.",
+      "Example: you use a visual timeline on the board to explain the Present Perfect tense. You give clear examples. You check understanding using concept-checking questions — CCQs. That's the Instructor.",
+      "The challenge? Research by Farrell in 2007 shows that most beginner teachers spend almost all their time here. They explain, present, demonstrate — but rarely step into the other four roles. That's exactly what AITTC will help you change.",
+
+      {type:"section", text:"Role 2 — Facilitator"},
+      "The Facilitator is perhaps the hardest role for new teachers — because it requires you to do less, not more.",
+      "You design a task, give clear instructions, and then step back. You let your learners work. You resist the urge to interrupt, correct, or fill the silence.",
+      "Example: 'Discuss with your partner the advantages of learning English online.' Instructions given. Understanding checked. And then — you move to the side of the room and let them talk. The Facilitator understands that learning happens when learners are doing things — not when the teacher is talking.",
+
+      {type:"section", text:"Role 3 — Monitor"},
+      "While your learners are working, you shift into Monitor. You circulate. You listen. You take notes on what learners are producing — the errors you hear, who's struggling, who's excelling, who has gone quiet.",
+      "The key word is systematic. A good Monitor doesn't just wander — they have a purpose. They're collecting information for delayed error correction: addressing errors after the activity, not interrupting it.",
+      "Why delayed? Because Lyster and Ranta showed in 1997 that interrupting a learner mid-sentence to correct their grammar can damage confidence and reduce willingness to speak. Timing matters enormously.",
+
+      {type:"section", text:"Role 4 — Resource"},
+      "The Resource role is reactive. A student raises their hand during a writing task: 'How do you say on the other hand in English?' You answer quickly and quietly — without disrupting the class — and move on.",
+      "The important distinction: as a Resource you respond to learner need. You don't pre-teach everything. That would pull you back into Instructor mode when your learners need space to work.",
+
+      {type:"section", text:"Role 5 — Motivator"},
+      "The fifth role — and in many ways the most important — is Motivator. You actively sustain engagement and confidence. You create what researchers call a psychologically safe environment — where learners feel safe to take risks, make mistakes, and try things they're not sure about yet.",
+      "This sounds simple. It isn't. A single careless correction, a dismissive response to a wrong answer, or a culture that rewards perfection over effort — any of these can silence a learner for the rest of the lesson. Or longer.",
+      "Practical examples: acknowledge improvement publicly. Praise effort, not just accuracy. Use learners' names. Build routines that reduce anxiety. These are not soft skills — they are professional tools.",
+
+      {type:"section", text:"Close of Video 2"},
+      "Five roles. Instructor. Facilitator. Monitor. Resource. Motivator. Professional teachers move fluidly between all five. The question is not which role you use — it's whether you use all of them, and whether you know when to switch.",
+      "In Video 3, we'll challenge six common myths about English language teaching — and we'll look at how your professional identity as a teacher begins to develop from this point forward."
+    ]
+  },
+  v3: {
+    title: "Video 3 — Challenging Myths, Teacher Identity, Gibbs' Cycle",
+    paragraphs: [
+      {type:"section", text:"Opening"},
+      "Welcome to Video 3 — the final video of Session 1. We've established what a language teacher is and the five roles they occupy. Now we need to challenge some of the beliefs that can hold new teachers back — and begin thinking about who you are becoming as a professional.",
+
+      {type:"section", text:"Six Myths"},
+      "I'm going to walk you through six widely held beliefs about English teaching. Some of these may be things you've been told. Others may be things you've assumed without realising it. After each one, I'll tell you what the research actually says.",
+
+      {type:"section", text:"Myth 1 — You need a native accent to be a great teacher"},
+      "This is perhaps the most damaging myth in our profession. Medgyes in 1992 and Cook in 1999 both show that non-native teachers frequently outperform native speakers — in grammatical explanation, learner empathy, and metalinguistic awareness. Your accent does not determine your effectiveness.",
+
+      {type:"section", text:"Myth 2 — The more grammar you know, the better teacher you are"},
+      "Shulman's distinction is critical here. Content knowledge — knowing grammar — is not the same as pedagogical content knowledge — knowing how to teach it. A teacher who knows every grammar rule but cannot make it meaningful to a learner is not an effective teacher.",
+
+      {type:"section", text:"Myth 3 — A good teacher always corrects every mistake"},
+      "Lyster and Ranta in 1997, and Ellis in 2009, are clear: immediate, indiscriminate correction damages confidence and reduces fluency development. Selective, well-timed correction is a professional skill. Correcting everything is not thoroughness — it can silence your learners.",
+
+      {type:"section", text:"Myth 4 — Silence means students aren't learning"},
+      "Silence can mean thinking. Processing. Preparing. Writing. As Ur noted in 1996, appropriate silence is a natural and productive feature of effective lessons. The instinct to fill every silence with teacher talk is understandable — but often counterproductive.",
+
+      {type:"section", text:"Myth 5 — The teacher should talk most of the lesson"},
+      "Research on Teacher Talking Time versus Student Talking Time consistently shows that high TTT reduces speaking opportunities for learners. If you are talking for 40 of 60 minutes, your learners are not practising English — you are. That is the wrong person practising.",
+
+      {type:"section", text:"Myth 6 — Non-native teachers are less effective than native speakers"},
+      "We return to Medgyes and Cook because this myth is so persistent. The research is unambiguous: teaching effectiveness is determined by professional knowledge, pedagogical skill, and reflective practice — not by the passport you hold or the accent you speak with.",
+
+      {type:"section", text:"Teacher Identity & Gibbs' Cycle"},
+      "We've covered a lot of ground. Let's bring it together with the most important question of all: who are you as a teacher?",
+      "Teacher identity — your evolving sense of who you are as a professional — is not fixed. It develops through experience, feedback, professional reading, and above all through reflection.",
+      "Throughout AITTC, you'll use Gibbs' Reflective Cycle — developed in 1988 — to structure your professional reflection after every session. Six stages.",
+      "Stage One: Description — what happened? Just the facts. Stage Two: Feelings — how did you feel? How did your learners appear to feel? Stage Three: Evaluation — what worked? What didn't? Stage Four: Analysis — why? Connect your experience to theory. This is the most important stage. Stage Five: Conclusion — what would you do differently? Stage Six: Action Plan — what specific change will you make next time?",
+      "The Teaching Journal you begin after this session is not optional. It's not busywork. It is the single most powerful professional development habit you can build right now.",
+
+      {type:"section", text:"Final Close"},
+      "I want to leave you with the core idea of Session 1:",
+      "Teaching is not explaining English. Teaching is designing a learning experience.",
+      "Your homework is in your Handbook — four tasks before Session 2. A Teaching Journal entry, a YouTube observation, a Personal Belief Statement, and an AI exploration task. All four matter. All four build directly on today.",
+      "Thank you for completing Session 1. I'll see you in Session 2 — where we go deeper into professional identity, reflective practice, and the ethics of teaching."
+    ]
+  }
+};
+
+function buildHTML(key){
+  const keys = key === "all" ? ["v1","v2","v3"] : [key];
+  let html = "";
+  keys.forEach(k=>{
+    const vid = content[k];
+    html += `<div class="video-title">${vid.title}</div>`;
+    vid.paragraphs.forEach(p=>{
+      if(typeof p === "object" && p.type === "section"){
+        html += `<div class="section-label">${p.text}</div>`;
+      } else {
+        html += `<p>${p}</p>`;
+      }
+    });
+  });
+  return html;
+}
+
+const textEl = document.getElementById('prompterText');
+const wrapEl = document.getElementById('prompterWrap');
+const videoSelect = document.getElementById('videoSelect');
+const speedSlider = document.getElementById('speedSlider');
+const fontSlider = document.getElementById('fontSlider');
+const playBtn = document.getElementById('playBtn');
+const mirrorBtn = document.getElementById('mirrorBtn');
+const highlightBtn = document.getElementById('highlightBtn');
+const voiceBtn = document.getElementById('voiceBtn');
+const resetBtn = document.getElementById('resetBtn');
+const hintEl = document.getElementById('hint');
+const progressBarEl = document.getElementById('progressBar');
+const statPct = document.getElementById('statPct');
+const statElapsed = document.getElementById('statElapsed');
+const statRemain = document.getElementById('statRemain');
+const voiceBadge = document.getElementById('voiceBadge');
+
+setTimeout(()=>{ hintEl.classList.add('faded'); }, 6000);
+
+let playing = false;
+let highlightOn = false;
+let startTime = null;
+let elapsedAtPause = 0;
+
+// ── Highlight current line ──────────────────────────────────────────
+function updateHighlight(){
+  if(!highlightOn) return;
+  const centerY = wrapEl.getBoundingClientRect().top + wrapEl.clientHeight * 0.38;
+  let closest = null, closestDist = Infinity;
+  textEl.querySelectorAll('p, .section-label').forEach(el=>{
+    el.classList.remove('line-active');
+    const r = el.getBoundingClientRect();
+    const mid = r.top + r.height / 2;
+    const dist = Math.abs(mid - centerY);
+    if(dist < closestDist){ closestDist = dist; closest = el; }
+  });
+  if(closest) closest.classList.add('line-active');
+}
+
+// ── Progress + time ─────────────────────────────────────────────────
+function fmt(sec){
+  const m = Math.floor(sec/60), s = Math.floor(sec%60);
+  return m+':'+(s<10?'0':'')+s;
+}
+function updateProgress(){
+  const max = wrapEl.scrollHeight - wrapEl.clientHeight;
+  const pct = max > 0 ? wrapEl.scrollTop / max : 0;
+  progressBarEl.style.width = (pct*100).toFixed(1)+'%';
+  statPct.textContent = Math.round(pct*100)+'%';
+  const now = Date.now();
+  const elapsed = playing && startTime ? elapsedAtPause + (now - startTime)/1000 : elapsedAtPause;
+  statElapsed.textContent = fmt(elapsed);
+  if(pct > 0.001){
+    const total = elapsed / pct;
+    const remain = Math.max(0, total - elapsed);
+    statRemain.textContent = fmt(remain);
+  } else {
+    statRemain.textContent = '—';
+  }
+}
+
+// ── Voice tracking — transcript alignment ──────────────────────────
+let recognition = null;
+let voiceActive = false;
+
+// Flat word list extracted from prompter content
+let scriptWords = [];   // [{word, paraIdx, wordIdx}]
+let alignCursor = 0;    // index into scriptWords of next expected word
+let voiceScrollTarget = null; // null = no override; number = target scrollTop
+let voiceSpeaking = false;
+
+function normalizeWord(w){
+  return w.toLowerCase().replace(/[^a-z0-9']/g, '');
+}
+
+function buildScriptWords(){
+  scriptWords = [];
+  textEl.querySelectorAll('p').forEach((el, pi)=>{
+    const words = el.textContent.trim().split(/\s+/);
+    words.forEach((w, wi)=>{
+      const n = normalizeWord(w);
+      if(n) scriptWords.push({norm:n, el, pi, wi});
+    });
+  });
+  alignCursor = 0;
+  voiceScrollTarget = null;
+}
+
+// Try to match a transcript string against scriptWords starting near alignCursor.
+// Returns the index of the last matched word, or -1 if no match.
+function matchTranscript(transcript){
+  const spoken = transcript.trim().split(/\s+/).map(normalizeWord).filter(Boolean);
+  if(!spoken.length) return -1;
+
+  // Search window: look ahead up to 80 words from cursor (handles skips/restarts)
+  const searchStart = Math.max(0, alignCursor - 5);
+  const searchEnd   = Math.min(scriptWords.length - spoken.length, alignCursor + 80);
+
+  let bestIdx = -1, bestScore = 0;
+
+  for(let i = searchStart; i <= searchEnd; i++){
+    let matches = 0;
+    for(let j = 0; j < spoken.length && i+j < scriptWords.length; j++){
+      if(scriptWords[i+j].norm === spoken[j]) matches++;
+    }
+    const score = matches / spoken.length;
+    if(score > bestScore && score >= 0.5){
+      bestScore = score;
+      bestIdx = i + spoken.length - 1; // last matched word position
+    }
+  }
+  return bestIdx;
+}
+
+function scrollToWord(wordIdx){
+  const entry = scriptWords[wordIdx];
+  if(!entry) return;
+  const elRect = entry.el.getBoundingClientRect();
+  const wrapRect = wrapEl.getBoundingClientRect();
+  // Target: matched paragraph sits at 38% from top (center line)
+  const target = wrapEl.scrollTop + (elRect.top - wrapRect.top) - wrapEl.clientHeight * 0.38;
+  voiceScrollTarget = Math.max(0, target);
+}
+
+// ── UI state helpers ────────────────────────────────────────────────
+function setManualMode(){
+  // Voice off → enable Play + Speed
+  playBtn.disabled = false;
+  playBtn.style.opacity = '';
+  speedSlider.disabled = false;
+  speedSlider.style.opacity = '';
+}
+
+function setVoiceMode(){
+  // Voice on → disable Play + Speed, stop any manual playback
+  if(playing){
+    elapsedAtPause += (Date.now() - startTime) / 1000;
+    startTime = null;
+    playing = false;
+  }
+  playBtn.textContent = "▶ Play";
+  playBtn.disabled = true;
+  playBtn.style.opacity = '0.35';
+  speedSlider.disabled = true;
+  speedSlider.style.opacity = '0.35';
+}
+
+// ── Voice mode ──────────────────────────────────────────────────────
+const SILENCE_STOP_MS = 7000; // 7 s silence → stop scroll
+let _silenceTimer = null;
+
+function onSpeechDetected(transcript){
+  voiceSpeaking = true;
+  clearTimeout(_silenceTimer);
+  _silenceTimer = setTimeout(()=>{
+    voiceSpeaking = false;
+    voiceScrollTarget = null;
+    voiceBadge.textContent = '🎤 Listening…';
+    voiceBadge.className = 'listening';
+  }, SILENCE_STOP_MS);
+
+  const matchedIdx = matchTranscript(transcript);
+  if(matchedIdx !== -1 && matchedIdx >= alignCursor){
+    alignCursor = matchedIdx + 1;
+    scrollToWord(matchedIdx);
+    voiceBadge.textContent = '🗣 Speaking';
+    voiceBadge.className = 'active';
+  } else {
+    voiceScrollTarget = null; // no jump — let baseline speed carry
+    voiceBadge.textContent = '🗣 Speaking';
+    voiceBadge.className = 'active';
+  }
+}
+
+function startVoice(){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){
+    alert('متأسفانه مرورگر شما Web Speech API را پشتیبانی نمی‌کند.\nلطفاً از Chrome استفاده کنید.');
+    return;
+  }
+  buildScriptWords();
+  setVoiceMode();
+
+  recognition = new SR();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+
+  recognition.onstart = ()=>{
+    voiceActive = true;
+    voiceSpeaking = false;
+    voiceBadge.textContent = '🎤 Listening…';
+    voiceBadge.className = 'listening';
+    voiceBtn.classList.add('active');
+    voiceBtn.textContent = '🎤 Voice ON';
+  };
+
+  recognition.onresult = (e)=>{
+    let interim = '', final = '';
+    for(let i = e.resultIndex; i < e.results.length; i++){
+      const t = e.results[i][0].transcript;
+      if(e.results[i].isFinal) final += t + ' ';
+      else interim += t;
+    }
+    const transcript = (final || interim).trim();
+    if(transcript) onSpeechDetected(transcript);
+  };
+
+  recognition.onerror = (e)=>{
+    if(e.error === 'not-allowed'){
+      alert('میکروفون دسترسی ندارد. لطفاً مجوز میکروفون را در مرورگر فعال کنید.');
+      stopVoice();
+    }
+    // other errors (network, aborted): onend will auto-restart
+  };
+
+  recognition.onend = ()=>{
+    // Auto-reconnect as long as voice mode is active
+    if(voiceActive){
+      try { recognition.start(); } catch(_){}
+    }
+  };
+
+  recognition.start();
+}
+
+function stopVoice(){
+  voiceActive = false;
+  voiceSpeaking = false;
+  voiceScrollTarget = null;
+  clearTimeout(_silenceTimer);
+  if(recognition){ try{ recognition.stop(); }catch(_){} }
+  voiceBadge.textContent = '🎤 Voice off';
+  voiceBadge.className = '';
+  voiceBtn.classList.remove('active');
+  voiceBtn.textContent = '🎤 Voice';
+  setManualMode();
+}
+
+// ── Main loop ───────────────────────────────────────────────────────
+// Baseline scroll speed in voice mode (matches Speed slider midpoint feel)
+const VOICE_BASE_SPEED = 40;
+
+function tick(){
+  if(voiceActive){
+    // Voice mode — fully independent of `playing`
+    if(voiceSpeaking && voiceScrollTarget !== null){
+      const diff = voiceScrollTarget - wrapEl.scrollTop;
+      if(Math.abs(diff) > 1){
+        wrapEl.scrollTop += diff * 0.07;
+      } else {
+        voiceScrollTarget = null;
+      }
+    }
+    // No target or silent → do not scroll
+  } else if(playing){
+    // Manual mode
+    wrapEl.scrollTop += parseFloat(speedSlider.value) / 12;
+    if(wrapEl.scrollTop >= wrapEl.scrollHeight - wrapEl.clientHeight){
+      playing = false;
+      elapsedAtPause += (Date.now() - startTime) / 1000;
+      startTime = null;
+      playBtn.textContent = "▶ Play";
+    }
+  }
+  updateHighlight();
+  updateProgress();
+  requestAnimationFrame(tick);
+}
+
+// ── Controls ────────────────────────────────────────────────────────
+function render(){
+  textEl.innerHTML = buildHTML(videoSelect.value);
+  wrapEl.scrollTop = 0;
+  elapsedAtPause = 0;
+  startTime = null;
+  playing = false;
+  playBtn.textContent = "▶ Play";
+  voiceScrollTarget = null;
+  alignCursor = 0;
+  voiceSpeaking = false;
+  clearTimeout(_silenceTimer);
+  if(voiceActive) buildScriptWords();
+}
+
+playBtn.addEventListener('click', ()=>{
+  if(voiceActive) return; // disabled in voice mode
+  playing = !playing;
+  if(playing){
+    startTime = Date.now();
+    playBtn.textContent = "⏸ Pause";
+  } else {
+    elapsedAtPause += (Date.now() - startTime) / 1000;
+    startTime = null;
+    playBtn.textContent = "▶ Play";
+  }
+  hintEl.classList.add('faded');
+});
+
+resetBtn.addEventListener('click', ()=>{
+  wrapEl.scrollTop = 0;
+  playing = false;
+  elapsedAtPause = 0;
+  startTime = null;
+  playBtn.textContent = "▶ Play";
+  voiceSpeaking = false;
+  voiceScrollTarget = null;
+  alignCursor = 0;
+  clearTimeout(_silenceTimer);
+  if(voiceActive){
+    voiceBadge.textContent = '🎤 Listening…';
+    voiceBadge.className = 'listening';
+  }
+});
+
+mirrorBtn.addEventListener('click', ()=>{
+  textEl.classList.toggle('mirror');
+  mirrorBtn.classList.toggle('active');
+});
+
+highlightBtn.addEventListener('click', ()=>{
+  highlightOn = !highlightOn;
+  textEl.classList.toggle('highlight-on', highlightOn);
+  highlightBtn.classList.toggle('active', highlightOn);
+  if(!highlightOn){
+    textEl.querySelectorAll('.line-active').forEach(el=>el.classList.remove('line-active'));
+  }
+});
+
+voiceBtn.addEventListener('click', ()=>{
+  voiceActive ? stopVoice() : startVoice();
+});
+
+fontSlider.addEventListener('input', ()=>{
+  textEl.style.fontSize = fontSlider.value + "px";
+});
+
+videoSelect.addEventListener('change', render);
+
+document.addEventListener('keydown', (e)=>{
+  if(e.code === 'Space' && !voiceActive){
+    e.preventDefault();
+    playBtn.click();
+  } else if(e.code === 'ArrowUp' && !voiceActive){
+    speedSlider.value = Math.min(120, parseInt(speedSlider.value) + 5);
+  } else if(e.code === 'ArrowDown' && !voiceActive){
+    speedSlider.value = Math.max(10, parseInt(speedSlider.value) - 5);
+  }
+});
+
+wrapEl.addEventListener('wheel', (e)=>{
+  wrapEl.scrollTop += e.deltaY;
+}, {passive:true});
+
+render();
+tick();
+</script>
+</body>
+</html>
