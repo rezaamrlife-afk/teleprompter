@@ -289,7 +289,8 @@
       <button id="voiceBtn">🎙️ Voice Tracking</button>
       <div class="ctrl-group">
         Speed
-        <input type="range" id="speedSlider" min="10" max="120" value="40">
+        <input type="range" id="speedSlider" min="1" max="100" value="15" step="1">
+        <span id="speedValue" style="min-width:22px;display:inline-block;">15</span>
       </div>
       <div class="ctrl-group">
         Font size
@@ -453,6 +454,10 @@ const remainingTimeEl = document.getElementById('remainingTime');
 const paceInfoEl = document.getElementById('paceInfo');
 const micWarningEl = document.getElementById('micWarning');
 
+const speedValueEl = document.getElementById('speedValue');
+function syncSpeedReadout(){ speedValueEl.textContent = speedSlider.value; }
+speedSlider.addEventListener('input', syncSpeedReadout);
+
 setTimeout(()=>{ hintEl.classList.add('faded'); }, 7000);
 
 let playing = false;
@@ -605,7 +610,7 @@ function updateProgressUI(){
 /* ---- Auto-scroll (manual) mode ---- */
 function tick(){
   if(playing){
-    const speed = parseFloat(speedSlider.value) / 12;
+    const speed = parseFloat(speedSlider.value) / 28;
     wrapEl.scrollTop += speed;
     if(wrapEl.scrollTop >= wrapEl.scrollHeight - wrapEl.clientHeight){
       playing = false;
@@ -661,9 +666,11 @@ document.addEventListener('keydown', (e)=>{
       startWordIdx = Math.max(currentWordIdx, 0);
     }
   } else if(e.code === 'ArrowUp'){
-    speedSlider.value = Math.min(120, parseInt(speedSlider.value)+5);
+    speedSlider.value = Math.min(100, parseInt(speedSlider.value)+2);
+    syncSpeedReadout();
   } else if(e.code === 'ArrowDown'){
-    speedSlider.value = Math.max(10, parseInt(speedSlider.value)-5);
+    speedSlider.value = Math.max(1, parseInt(speedSlider.value)-2);
+    syncSpeedReadout();
   }
 });
 
