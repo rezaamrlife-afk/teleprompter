@@ -510,6 +510,7 @@ function buildHTML(key){
 function render(){
   textEl.innerHTML = buildHTML(videoSelect.value);
   wrapEl.scrollTop = 0;
+  scrollPos = 0;
   indexWords();
   recalcTops();
   resetProgressState();
@@ -608,10 +609,13 @@ function updateProgressUI(){
 }
 
 /* ---- Auto-scroll (manual) mode ---- */
+let scrollPos = 0; // exact fractional scroll position, independent of the browser's rounded scrollTop
+
 function tick(){
   if(playing){
     const speed = parseFloat(speedSlider.value) / 28;
-    wrapEl.scrollTop += speed;
+    scrollPos += speed;
+    wrapEl.scrollTop = scrollPos;
     if(wrapEl.scrollTop >= wrapEl.scrollHeight - wrapEl.clientHeight){
       playing = false;
       playBtn.textContent = "▶ Play";
@@ -634,6 +638,7 @@ playBtn.addEventListener('click', ()=>{
 
 resetBtn.addEventListener('click', ()=>{
   wrapEl.scrollTop = 0;
+  scrollPos = 0;
   playing = false;
   playBtn.textContent = "▶ Play";
   resetProgressState();
@@ -677,6 +682,7 @@ document.addEventListener('keydown', (e)=>{
 wrapEl.addEventListener('wheel', (e)=>{
   if(voiceActive) return;
   wrapEl.scrollTop += e.deltaY;
+  scrollPos = wrapEl.scrollTop;
 }, {passive:true});
 
 window.addEventListener('resize', ()=>{ requestAnimationFrame(recalcTops); });
@@ -696,7 +702,9 @@ function showMicWarning(msg){
 function scrollWordToCenter(idx, smooth){
   if(idx < 0 || idx >= wordTops.length) return;
   const target = wordTops[idx] - wrapEl.clientHeight * 0.38;
-  wrapEl.scrollTo({ top: Math.max(target,0), behavior: smooth ? 'smooth' : 'auto' });
+  const clamped = Math.max(target,0);
+  wrapEl.scrollTo({ top: clamped, behavior: smooth ? 'smooth' : 'auto' });
+  scrollPos = clamped;
 }
 
 function handleSpokenWord(spoken){
