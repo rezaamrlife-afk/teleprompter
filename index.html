@@ -699,8 +699,11 @@ window.addEventListener('resize', ()=>{ requestAnimationFrame(recalcTops); });
 /* ===================== VOICE TRACKING ===================== */
 let recognition = null;
 let voiceActive = false;
-const LOOKAHEAD = 22;       // how many words ahead we search for a match
-const LEAD_WORDS = 5;       // compensate for ~0.5-1.5s speech-recognition network latency
+const LOOKAHEAD = 40;              // how far ahead of the current position we search for a match
+const LEAD_WORDS = 5;              // compensate for ~0.5-1.5s speech-recognition network latency
+const BUFFER_SIZE = 8;             // how many recent spoken words we consider for matching
+const MIN_BUFFER_FOR_MATCH = 3;    // don't even attempt a match until we have at least this many words
+const MATCH_THRESHOLD = 0.6;       // fraction of buffer words that must align before we trust the match
 
 function showMicWarning(msg){
   micWarningEl.textContent = msg;
@@ -708,7 +711,7 @@ function showMicWarning(msg){
   setTimeout(()=>{ micWarningEl.style.display = 'none'; }, 6000);
 }
 
-let voiceTargetScroll = null; // desired scroll position from the latest voice match; null = not voice-driven yet
+let voiceTargetScroll = null; // desired scroll position from the latest confident voice match; null = not voice-driven yet
 
 function scrollWordToCenter(idx){
   if(idx < 0 || idx >= wordTops.length) return;
@@ -716,19 +719,47 @@ function scrollWordToCenter(idx){
   voiceTargetScroll = Math.max(target, 0);
 }
 
-function handleSpokenWord(spoken){
-  const s = norm(spoken);
-  if(!s) return;
-  const start = Math.max(currentWordIdx, 0);
-  const end = Math.min(start + LOOKAHEAD, normWords.length);
-  for(let i = start; i < end; i++){
-    if(normWords[i] === s){
-      currentWordIdx = i;
-      const leadIdx = Math.min(i + LEAD_WORDS, wordTops.length - 1);
-      scrollWordToCenter(leadIdx);
-      updateHighlightAndProgress();
-      return;
+/*
+ * Instead of chasing the single most-recent recognized word (which is fragile —
+ * one misheard word causes a false jump), we keep a rolling buffer of the last
+ * several spoken words and search a window of upcoming script text for the best
+ * contiguous alignment. We only move the prompter if that alignment is strong
+ * (most of the buffer matches) AND it's further ahead than where we already are.
+ * Otherwise we hold position — a single bad recognition, a skipped word, or a
+ * repeated phrase won't cause a stray jump.
+ */
+function processSpokenWords(rawWords){
+  const words = rawWords.map(norm).filter(Boolean);
+  if(words.length === 0) return;
+  const buffer = words.slice(-BUFFER_SIZE);
+  if(buffer.length < MIN_BUFFER_FOR_MATCH) return;
+
+  const searchStart = Math.max(currentWordIdx, 0);
+  const searchEnd = Math.min(searchStart + LOOKAHEAD, normWords.length - buffer.length + 1);
+  if(searchEnd <= searchStart) return;
+
+  let bestScore = 0;
+  let bestOffset = -1;
+  for(let k = searchStart; k < searchEnd; k++){
+    let matches = 0;
+    for(let i = 0; i < buffer.length; i++){
+      if(normWords[k + i] === buffer[i]) matches++;
     }
+    const score = matches / buffer.length;
+    if(score > bestScore){
+      bestScore = score;
+      bestOffset = k;
+    }
+  }
+
+  if(bestOffset < 0 || bestScore < MATCH_THRESHOLD) return; // not confident enough — hold position
+
+  const matchedEndIdx = bestOffset + buffer.length - 1;
+  if(matchedEndIdx > currentWordIdx){
+    currentWordIdx = matchedEndIdx;
+    const leadIdx = Math.min(currentWordIdx + LEAD_WORDS, wordTops.length - 1);
+    scrollWordToCenter(leadIdx);
+    updateHighlightAndProgress();
   }
 }
 
@@ -747,11 +778,12 @@ function startVoiceTracking(){
   recognition.lang = 'en-US';
 
   recognition.onresult = (event)=>{
-    for(let r = event.resultIndex; r < event.results.length; r++){
-      const transcript = event.results[r][0].transcript;
-      const words = transcript.trim().split(/\s+/);
-      words.forEach(handleSpokenWord);
+    let allWords = [];
+    for(let r = 0; r < event.results.length; r++){
+      const transcript = event.results[r][0].transcript.trim();
+      if(transcript) allWords = allWords.concat(transcript.split(/\s+/).filter(Boolean));
     }
+    processSpokenWords(allWords);
   };
   recognition.onerror = (e)=>{
     if(e.error === 'not-allowed' || e.error === 'service-not-allowed'){
