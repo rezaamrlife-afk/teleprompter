@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NIR Academy — Teleprompter | Session 10</title>
+<title>NIR Academy — Teleprompter | Session 1</title>
 <style>
   :root{
     --bg:#0A0A0A;
@@ -26,8 +26,6 @@
     flex-direction:column;
     height:100vh;
   }
-
-  /* ---- Top bar ---- */
   #topbar{
     display:flex;
     align-items:center;
@@ -121,8 +119,6 @@
     70%{box-shadow:0 0 0 8px rgba(193,75,75,0);}
     100%{box-shadow:0 0 0 0 rgba(193,75,75,0);}
   }
-
-  /* ---- Progress bar ---- */
   #progressBar{
     height:4px;
     background:#1c1a17;
@@ -152,8 +148,6 @@
     color:var(--gold);
     font-weight:600;
   }
-
-  /* ---- Prompter area ---- */
   #prompterWrap{
     flex:1;
     position:relative;
@@ -213,7 +207,6 @@
   .w{
     display:inline;
   }
-
   #fadeTop, #fadeBottom{
     position:absolute;
     left:0;right:0;
@@ -229,7 +222,6 @@
     bottom:0;
     background:linear-gradient(to top, var(--bg), transparent);
   }
-
   #hint{
     position:fixed;
     bottom:14px;
@@ -251,7 +243,6 @@
     opacity:0;
     pointer-events:none;
   }
-
   #micWarning{
     position:fixed;
     top:70px;
@@ -269,7 +260,6 @@
     text-align:center;
     display:none;
   }
-
   ::-webkit-scrollbar{display:none;}
 </style>
 </head>
@@ -324,113 +314,157 @@
 /* ===================== SCRIPT CONTENT ===================== */
 const content = {
   v1: {
-    title: "Video 1 — Language User vs Language Teacher",
+    title: "Video 1 — The Five Core Teacher Roles",
     paragraphs: [
-      {type:"section", text:"Opening"},
-      "Welcome to Session One of AITTC — the AI-Powered English Teacher Training Course.",
-      "My name is Dr. Niki Majidi. In this first video, we're going to explore the most fundamental question in this entire course:",
-      "What is the difference between someone who speaks English — and someone who teaches it?",
-      "Before I answer that — I want you to do something. Think of the best teacher you ever had. Any subject. Any age. Just picture them for a moment.",
-      "Now — what made them great? In my experience, after asking this question to thousands of trainee teachers, nobody ever says: 'their grammar was perfect' or 'they had a native accent.' What people remember is how that teacher made them feel. And that tells us something very important about what teaching actually is.",
+      {type:"section", text:"Hook & Context"},
+      "Before we start — I want you to think of one teacher. The best teacher you ever had.",
+      "Not the one with the most knowledge. The one who made you feel like you could actually do it.",
+      "What did that person actually do? Not what did they know — what did they do?",
+      "In this video we're going to answer that question with research. And that answer is going to change how you think about what it means to be an English language teacher.",
+      "Jeremy Harmer — one of the most widely cited researchers in English Language Teaching — identified something that most people miss when they think about teaching.",
+      "He said: a language teacher is not a single role. It is a system of five distinct roles.",
+      "And a skilled teacher knows which one the moment requires — and switches between them fluidly, in real time, often within a single minute of class. That's what we're going to map today.",
 
-      {type:"section", text:"Language User vs Language Teacher"},
-      "Here is the most common misconception in English language education: if you speak English well, you can teach it.",
-      "Think about it this way. You can drive a car — but that doesn't make you a driving instructor. You can cook — but that doesn't make you a chef who can train others. The same logic applies to English.",
-      "A language user communicates effectively in English. Fluency, vocabulary, a good accent — these are real strengths.",
-      "But a language teacher is a professional who has developed specialised knowledge and tools to help others acquire a language. As the researcher Shulman showed in 1987, this requires what he called pedagogical content knowledge — not just knowing English, but knowing how to make English learnable for others. That distinction is everything.",
-      "A professional language teacher understands how language is structured — grammar, vocabulary, pronunciation.",
-      "They understand how people learn second languages — what researchers call Second Language Acquisition theory.",
-      "They can anticipate the difficulties their learners will face before those difficulties arise.",
-      "And they can respond flexibly when things don't go to plan — which, in teaching, is most of the time.",
-      "Here's a finding that surprises many people. Andrews, in 2007, found that teachers with high metalinguistic awareness — the ability to think analytically about language — were consistently rated more effective than teachers with high fluency but low analytical awareness. Understanding how English works matters more than how naturally you speak it.",
+      {type:"section", text:"The Five Roles"},
+      "Harmer's framework gives us five roles. I'm going to take you through each one with a concrete classroom scenario. As I describe each role, I want you to ask yourself: Have I seen this? Have I experienced this as a learner?",
+      "Role one: Controller. As Controller, you manage the class, direct activity, and control pace. You give clear, brief instructions. Learners know exactly what to do.",
+      "Role two: Prompter. As Prompter, you nudge a stuck learner without taking over. A hint, a word, a gesture — not the answer.",
+      "Role three: Participant. As Participant, you join the activity as a genuine communicative partner. You share your real opinion as one voice among many.",
+      "Role four: Resource. As Resource, you are the source of language knowledge learners access on demand. Brief, clear, non-disruptive — the learner goes back to the task.",
+      "Role five: Assessor. As Assessor, you evaluate performance and give feedback. Specific, timely, actionable — after the task, not during it.",
+      "Let me make these real. Here is one classroom moment — five possible responses.",
+      "You have a speaking task running. Two learners in the back are doing all the talking. Three learners in the front have stopped. What do you do?",
+      "As Controller — you stop the whole class and reset the task. As Prompter — you move to the quiet group and offer a conversation starter. As Participant — you pull a chair up to the quiet group and share your own view. As Resource — you wait. They may need thinking time, not intervention. As Assessor — you're watching. You're noting. You'll come back to this at feedback time.",
+      "Every single one of these can be the right choice. The skill is knowing which one, right now, for these specific learners. That judgment — that is teaching. No algorithm produces it.",
 
-      {type:"section", text:"Research Spotlight"},
-      "I want to share two pieces of research that shape everything we do in AITTC.",
-      "First: Medgyes, in 1992, conducted a landmark study showing that non-native English-speaking teachers frequently outperform native speakers in grammatical explanation, learner empathy, and metalinguistic awareness. Why? Because a non-native teacher has walked the road their learners are walking. That shared experience is not a weakness — it is a professional advantage.",
-      "Second: Cook, in 1999, introduced the concept of the multi-competent speaker — a bilingual or multilingual teacher who brings a richer understanding of language acquisition than a monolingual native speaker can offer.",
-      "Together, these studies challenge what Phillipson called the native speaker fallacy — the assumption that native speakers make inherently superior teachers. The research says otherwise. Your accent does not determine your effectiveness. Your professional knowledge and skills do.",
+      {type:"section", text:"The Novice Teacher Pattern"},
+      "Here is something Scrivener found — and Farrell confirmed — that almost every new teacher recognises the moment they hear it.",
+      "Novice teachers default to one role: Controller. They plan, they explain, they instruct, they manage. That's it.",
+      "Not because they're bad teachers. Because Controller is the role that feels safe. It's the role where you feel in charge. Where you know what's coming next.",
+      "But here's the problem: Controller is the role that creates the least learning. The roles that create the most learning — Prompter, Participant, Resource — those are the roles where you let go. And letting go, when you're new, is terrifying.",
+      "AITTC is designed to develop your capacity across all five roles — not just Controller. Every session from this point forward is going to ask you: which role does this moment require? And you're going to practice switching. That's the work.",
 
-      {type:"section", text:"Close of Video 1"},
-      "In this video, we've established the core distinction: knowing English and teaching English are two different professional competencies.",
-      "In Video 2, we're going to look at the five professional roles that every effective language teacher must develop — and how expert teachers move between them within a single lesson.",
-      "Before you move on, complete the pause task in your Handbook if you haven't already. Then come back for Video 2."
+      {type:"section", text:"Scenario Practice"},
+      "Now I'm going to give you five classroom moments. For each one, I want you to pause the video, decide which role is being played — and whether it's the right one.",
+      "There's no single correct answer for every moment. The point is to have a reason. Write it in your handbook — Stage 3, Activity 1 table. We'll discuss these in the live session.",
+
+      {type:"section", text:"NIRA Integration & Closing"},
+      "Before your live session, I want you to try something with NIRA — NIR Academy AI. Open NIRA and give it this prompt — it's in your handbook, Stage 2, NIRA box.",
+      "The prompt is: 'A language teacher is about to start a pair speaking task. List the different roles they might need to play before, during, and after the task — and explain when they should switch between them.'",
+      "Read NIRA's answer. Then ask yourself four questions — and write your answers in the handbook. Does NIRA mention all five roles, or does it miss some? Does NIRA explain when to switch — or just list the roles? Does NIRA show any understanding of why role-switching matters for acquisition? Is there anything in NIRA's response that feels generic, incomplete, or incorrect?",
+      "NIRA will give you a fast, fluent answer. That is not the same as a professional answer. Your job is to evaluate the gap between what NIRA produced and what a trained teacher knows. That gap is what you're here to close.",
+      "In your live session, bring your NIRA evaluation. We're going to use it.",
+      "Here is the one thing I want you to carry forward from this video: Teaching is not one role. It is five. And the most important professional skill you will develop in AITTC is knowing which one this moment needs.",
+      "See you in the live session."
     ]
   },
   v2: {
-    title: "Video 2 — The Five Teacher Roles",
+    title: "Video 2 — Language User vs Language Teacher",
     paragraphs: [
-      {type:"section", text:"Opening"},
-      "Welcome back. In Video 1, we established that teaching is a profession — not just a skill. In this video, we're going to look at what professional teachers actually do: the five roles they move between in every lesson.",
-      "Research by Harmer in 2007 — and extended by Scrivener in 2011 — identifies five essential roles. And here's the key: expert teachers don't stay in one role. They shift between all five — sometimes within the same five minutes. Let's look at each one.",
+      {type:"section", text:"The Assumption"},
+      "Here is a sentence I want you to think about. You'll have heard a version of it.",
+      "'She's a native speaker — she'll make a great teacher.' 'His English is perfect — I'm sure the students will love him.' 'We need a British or American teacher. That's what parents want.'",
+      "These are not fringe opinions. They are the hiring logic of hundreds of language schools around the world — including schools in Turkey right now.",
+      "And they are based on a fundamental confusion between two very different things: using a language and teaching a language. This video is about that gap. And about what happens when you close it.",
 
-      {type:"section", text:"Role 1 — Instructor"},
-      "The first role is the Instructor. This is the role most new teachers default to — and it's important. As an Instructor, you present new language clearly and accurately at the right level.",
-      "Example: you use a visual timeline on the board to explain the Present Perfect tense. You give clear examples. You check understanding using concept-checking questions — CCQs. That's the Instructor.",
-      "The challenge? Research by Farrell in 2007 shows that most beginner teachers spend almost all their time here. They explain, present, demonstrate — but rarely step into the other four roles. That's exactly what AITTC will help you change.",
+      {type:"section", text:"The Framework"},
+      "Let me be precise about this distinction. Not vague — precise.",
+      "A language user communicates without thinking about how. A language teacher analyses structure, meaning, and use — and makes language visible to learners.",
+      "A language user uses intuition for grammar and vocabulary. A language teacher can explain why something is correct — and what the rule is.",
+      "A language user focuses on getting their own message across. A language teacher focuses on what the learner needs to communicate — and how to help.",
+      "A language user responds to communication breakdowns personally. A language teacher responds to learner errors as data — asking: what should I teach next?",
+      "A language user judges success by asking: was I understood? A language teacher judges success by asking: have my learners developed?",
+      "Shulman (1987) gave us the research language for this. He distinguished between Content Knowledge — knowing the subject — and Pedagogical Content Knowledge — knowing how to teach it.",
+      "A language user has Content Knowledge. A language teacher has both. And the second one — Pedagogical Content Knowledge — is not something you are born with. It is something you learn. Which is why you are in this course.",
+      "A fluent speaker who cannot explain why 'I have been waiting' uses Present Perfect is a language user. The moment they can explain it clearly, grade that explanation to a B1 learner, anticipate the mistakes a Turkish L1 speaker will make, and decide when to correct and when to let it go — that is when they become a language teacher.",
 
-      {type:"section", text:"Role 2 — Facilitator"},
-      "The Facilitator is perhaps the hardest role for new teachers — because it requires you to do less, not more.",
-      "You design a task, give clear instructions, and then step back. You let your learners work. You resist the urge to interrupt, correct, or fill the silence.",
-      "Example: 'Discuss with your partner the advantages of learning English online.' Instructions given. Understanding checked. And then — you move to the side of the room and let them talk. The Facilitator understands that learning happens when learners are doing things — not when the teacher is talking.",
+      {type:"section", text:"Case Study — David"},
+      "Let me show you this distinction in a real scenario. This is David.",
+      "David graduated top of his class in English Literature. His written English is sophisticated. His spoken English is near-native. His school director told him: your English is perfect, so you'll be a great teacher. He believed it.",
+      "Three weeks into his first class — an intermediate adult group — here is what is happening. His explanations are clear. His vocabulary is impressive. But learners are confused. They don't know when to use Past Simple versus Present Perfect.",
+      "David explains it again, the same way, only slower and with more detail. The learners look more confused. David explains it again. What is happening here?",
+      "David is explaining from his own competence. He is not teaching from his learners' needs. That is the core error. And it is invisible to him, because from the inside, he feels like he is working hard and doing the right thing.",
+      "Here is the one move that would immediately improve David's teaching: stop explaining what he knows — and start asking what the learners understand.",
+      "A Concept Checking Question — a CCQ — is a simple question designed to reveal whether learners have grasped the concept without asking 'Do you understand?' which always gets answered 'Yes.'",
+      "For Present Perfect: 'Did this happen at a specific time in the past?' If learners answer 'yes' — they haven't got it yet. That's your data. That's teaching.",
 
-      {type:"section", text:"Role 3 — Monitor"},
-      "While your learners are working, you shift into Monitor. You circulate. You listen. You take notes on what learners are producing — the errors you hear, who's struggling, who's excelling, who has gone quiet.",
-      "The key word is systematic. A good Monitor doesn't just wander — they have a purpose. They're collecting information for delayed error correction: addressing errors after the activity, not interrupting it.",
-      "Why delayed? Because Lyster and Ranta showed in 1997 that interrupting a learner mid-sentence to correct their grammar can damage confidence and reduce willingness to speak. Timing matters enormously.",
+      {type:"section", text:"The AI Context"},
+      "Now I want to bring AI into this distinction — because AI changes it significantly.",
+      "Here is a fact: NIRA can explain Present Perfect. Accurately. Clearly. It can generate examples. It can produce gap-fill exercises. It can give corrective feedback. So by Shulman's definition, does NIRA have Pedagogical Content Knowledge?",
+      "No. And here is precisely why not.",
+      "NIRA does not know that the learner in front of you is nervous. NIRA does not know that three learners in your class have been using Present Perfect incorrectly for two years and have a fossilised error that needs a different approach.",
+      "NIRA does not know that your Tuesday class is confident but your Thursday class is fragile — and that the same correction strategy will destroy one group and help the other.",
+      "AI can generate content. Teachers generate learning. That distinction — write it down.",
+      "NIRA matches or exceeds a language user on every knowledge-based dimension. But on every relational, contextual, and in-the-moment dimension — nothing. That tells us something important about where your professional value lives as a teacher. Not in knowing more than NIRA. In doing what NIRA cannot do.",
+      "And every single thing in that Language Teacher column is a skill that can be developed. That is what AITTC is for.",
 
-      {type:"section", text:"Role 4 — Resource"},
-      "The Resource role is reactive. A student raises their hand during a writing task: 'How do you say on the other hand in English?' You answer quickly and quietly — without disrupting the class — and move on.",
-      "The important distinction: as a Resource you respond to learner need. You don't pre-teach everything. That would pull you back into Instructor mode when your learners need space to work.",
-
-      {type:"section", text:"Role 5 — Motivator"},
-      "The fifth role — and in many ways the most important — is Motivator. You actively sustain engagement and confidence. You create what researchers call a psychologically safe environment — where learners feel safe to take risks, make mistakes, and try things they're not sure about yet.",
-      "This sounds simple. It isn't. A single careless correction, a dismissive response to a wrong answer, or a culture that rewards perfection over effort — any of these can silence a learner for the rest of the lesson. Or longer.",
-      "Practical examples: acknowledge improvement publicly. Praise effort, not just accuracy. Use learners' names. Build routines that reduce anxiety. These are not soft skills — they are professional tools.",
-
-      {type:"section", text:"Close of Video 2"},
-      "Five roles. Instructor. Facilitator. Monitor. Resource. Motivator. Professional teachers move fluidly between all five. The question is not which role you use — it's whether you use all of them, and whether you know when to switch.",
-      "In Video 3, we'll challenge six common myths about English language teaching — and we'll look at how your professional identity as a teacher begins to develop from this point forward."
+      {type:"section", text:"NIRA Activity & Closing"},
+      "Before your live session, open NIRA and try this prompt — it's in your handbook, Stage 2, Key Concept 2, NIRA box.",
+      "'A fluent English speaker with no teaching training wants to become an English teacher. What specific knowledge and skills do they need to develop that they don't already have as a language user?'",
+      "Read what NIRA produces. Then ask yourself: does NIRA focus on knowledge — what to teach — or skill — how to teach? Does NIRA mention anything emotional, relational, or learner-specific? What's missing?",
+      "Then run the follow-up: 'Which of the skills on this list could you, as an AI, help a trainee teacher develop — and which could you not help with, and why?' This is one of the most revealing prompts in the entire course.",
+      "Here is what I want you to take from this video: Fluency is the entry requirement for this profession. It is not the qualification. The qualification is Pedagogical Content Knowledge — the ability to make language learnable for the specific learner in front of you, at this moment, in this context.",
+      "NIRA has fluency. You are here to develop PCK. Those are different things. And the gap between them is where your professional identity lives.",
+      "See you in the live session."
     ]
   },
   v3: {
-    title: "Video 3 — Challenging Myths, Teacher Identity, Gibbs' Cycle",
+    title: "Video 3 — What Makes a Classroom Work?",
     paragraphs: [
-      {type:"section", text:"Opening"},
-      "Welcome to Video 3 — the final video of Session 1. We've established what a language teacher is and the five roles they occupy. Now we need to challenge some of the beliefs that can hold new teachers back — and begin thinking about who you are becoming as a professional.",
+      {type:"section", text:"Hook — The Silent Class"},
+      "Imagine this. You've prepared a perfect lesson. Your grammar explanation was clear. Your task design followed the coursebook. Your instructions were precise.",
+      "You launch the speaking task. And — nothing. Silence.",
+      "Two learners look at their phones. One group talks in Turkish. Two learners stare at you waiting for you to do something.",
+      "What went wrong? The lesson was technically correct. So why isn't it working?",
+      "The answer is: a technically correct lesson and a functioning classroom are not the same thing. Between them sits something that most teacher training programmes barely mention — and that research shows is the single most powerful predictor of language acquisition outcomes. That is what this video is about.",
 
-      {type:"section", text:"Six Myths"},
-      "I'm going to walk you through six widely held beliefs about English teaching. Some of these may be things you've been told. Others may be things you've assumed without realising it. After each one, I'll tell you what the research actually says.",
+      {type:"section", text:"The Five Classroom Conditions"},
+      "Research in second language acquisition has identified five conditions that, when present, reliably produce learning outcomes — and when absent, reliably prevent them. These are not preferences. They are acquisition conditions.",
+      "Condition one: Psychological Safety. Based on Lightbown and Spada's research, learners won't take linguistic risks without it — and risk-taking is acquisition. The teacher establishes norms, responds to errors without shame, and builds a try-and-learn culture. AI cannot build this — it has no relational history with the learner.",
+      "Condition two: Comprehensible Input — what Krashen called i-plus-one. Acquisition happens when input is slightly above the current level — not too easy, not impossible. The teacher selects and adapts materials, grades their talk, and designs tasks at the right challenge level. AI can generate content at a level — but cannot read whether THIS learner is actually comprehending.",
+      "Condition three: Genuine Interaction. Long's research shows acquisition is accelerated through real communicative need — not simulated tasks. The teacher creates information gaps, real purposes, authentic reasons to communicate. AI can simulate interaction — but a learner has no genuine communicative need with an AI.",
+      "Condition four: Timely, Useful Feedback. Lyster and Ranta showed learners need to know when language is causing a problem — and what the alternative is. The teacher chooses when to correct, how to correct, and what to leave for later. AI can generate feedback — but cannot choose the right timing for this learner in this moment.",
+      "Condition five: Motivation and Engagement. Dörnyei's research is clear — unmotivated learners do not acquire, regardless of input quality. The teacher makes content relevant, celebrates progress, builds intrinsic motivation. AI cannot build motivation rooted in a human relationship and shared history.",
+      "Look at that last condition. For every condition, AI either cannot replicate it — or can approximate it technically but miss what makes it work.",
+      "Psychological safety is produced by a relationship. Not a system. A history of specific interactions in which a specific person responded to this specific learner in a way that told them: this is a safe place to try and fail. No algorithm builds that. A teacher builds it. Session by session, response by response. That is irreplaceable professional value — and it starts in the first five minutes of your first class.",
 
-      {type:"section", text:"Myth 1 — You need a native accent to be a great teacher"},
-      "This is perhaps the most damaging myth in our profession. Medgyes in 1992 and Cook in 1999 both show that non-native teachers frequently outperform native speakers — in grammatical explanation, learner empathy, and metalinguistic awareness. Your accent does not determine your effectiveness.",
+      {type:"section", text:"Case Study — Mariam"},
+      "Let me show you what it looks like when one of these conditions is missing — specifically psychological safety. This is Mariam.",
+      "Mariam is four weeks into her first teaching job. Mariam is well-prepared. Her lesson plans are detailed. Her grammar explanations are clear. She always has an answer when learners ask questions.",
+      "But something is going wrong. During speaking activities, Mariam circulates and interrupts pairs to correct their grammar mid-sentence. Learners have started hesitating before they speak. They look at her nervously before finishing sentences. The classroom feels anxious. Speaking tasks are getting shorter and quieter every week.",
+      "What is happening?",
+      "Mariam intends to help learners speak correctly. She intends to show she is attentive and careful. But what learners experience is: if I start a sentence, I might be wrong. It's safer to wait and say less. Speaking feels like a test, not a task.",
+      "Here is the important insight — and this comes from Scrivener: Mariam is not overcorrecting for the learners' benefit. She is overcorrecting for her own sense of security. Control, in the form of correction, makes a new teacher feel professional. It feels like evidence that they are doing their job.",
+      "But what it produces in the room is the opposite of psychological safety. And without psychological safety, you do not have a language acquisition environment. You have a performance anxiety environment.",
+      "The fix is not more technique. It is more self-awareness. That is what we're building next.",
 
-      {type:"section", text:"Myth 2 — The more grammar you know, the better teacher you are"},
-      "Shulman's distinction is critical here. Content knowledge — knowing grammar — is not the same as pedagogical content knowledge — knowing how to teach it. A teacher who knows every grammar rule but cannot make it meaningful to a learner is not an effective teacher.",
+      {type:"section", text:"Gibbs' Reflective Cycle"},
+      "Schon — one of the most influential researchers in professional development — made a finding that applies to teaching, medicine, law, architecture, and every other expertise-based profession.",
+      "Professionals who reflect systematically on their practice develop faster and make better decisions than those who simply accumulate experience. Experience alone is not the teacher. Reflected experience is.",
+      "Gibbs (1988) gave us a practical tool for doing this. Six stages. You'll use this for every Teaching Journal entry across all 30 sessions of this course.",
+      "Let me walk you through it using Mariam's situation — because it's exactly the kind of scenario Gibbs' Cycle is built for.",
+      "Stage one: Description. What happened? Just the facts. For Mariam: I corrected learners during speaking. They became quieter each week.",
+      "Stage two: Feelings. How did you feel? How did learners appear to feel? For Mariam: I felt like I was being professional. Now I feel confused and worried.",
+      "Stage three: Evaluation. What worked? What didn't? For Mariam: the explanations worked. The speaking tasks broke down.",
+      "Stage four: Analysis. Why did it happen? Connect to theory. For Mariam: my corrections removed psychological safety without me realising. This is the most important stage.",
+      "Stage five: Conclusion. What would you do differently? For Mariam: set a no-correction rule during fluency tasks. Observe only.",
+      "Stage six: Action Plan. What will you do next time? For Mariam: in the next speaking task — circulate silently. Note errors. Correct at feedback stage only.",
+      "Notice what the cycle does. It takes Mariam's experience — which, without reflection, would just confirm her existing beliefs about correction — and turns it into a specific, research-grounded change in practice. That is what reflection actually is. Not a diary. Not summarising what happened. A structured process for extracting professional learning from experience.",
+      "And here is the AI dimension of this: NIRA does not reflect. It generates. It can produce the stages of Gibbs' Cycle as a template. It cannot notice its own uncertainty, sit with it, and use it as a lever for growth. That is a human capacity.",
 
-      {type:"section", text:"Myth 3 — A good teacher always corrects every mistake"},
-      "Lyster and Ranta in 1997, and Ellis in 2009, are clear: immediate, indiscriminate correction damages confidence and reduces fluency development. Selective, well-timed correction is a professional skill. Correcting everything is not thoroughness — it can silence your learners.",
-
-      {type:"section", text:"Myth 4 — Silence means students aren't learning"},
-      "Silence can mean thinking. Processing. Preparing. Writing. As Ur noted in 1996, appropriate silence is a natural and productive feature of effective lessons. The instinct to fill every silence with teacher talk is understandable — but often counterproductive.",
-
-      {type:"section", text:"Myth 5 — The teacher should talk most of the lesson"},
-      "Research on Teacher Talking Time versus Student Talking Time consistently shows that high TTT reduces speaking opportunities for learners. If you are talking for 40 of 60 minutes, your learners are not practising English — you are. That is the wrong person practising.",
-
-      {type:"section", text:"Myth 6 — Non-native teachers are less effective than native speakers"},
-      "We return to Medgyes and Cook because this myth is so persistent. The research is unambiguous: teaching effectiveness is determined by professional knowledge, pedagogical skill, and reflective practice — not by the passport you hold or the accent you speak with.",
-
-      {type:"section", text:"Teacher Identity & Gibbs' Cycle"},
-      "We've covered a lot of ground. Let's bring it together with the most important question of all: who are you as a teacher?",
-      "Teacher identity — your evolving sense of who you are as a professional — is not fixed. It develops through experience, feedback, professional reading, and above all through reflection.",
-      "Throughout AITTC, you'll use Gibbs' Reflective Cycle — developed in 1988 — to structure your professional reflection after every session. Six stages.",
-      "Stage One: Description — what happened? Just the facts. Stage Two: Feelings — how did you feel? How did your learners appear to feel? Stage Three: Evaluation — what worked? What didn't? Stage Four: Analysis — why? Connect your experience to theory. This is the most important stage. Stage Five: Conclusion — what would you do differently? Stage Six: Action Plan — what specific change will you make next time?",
-      "The Teaching Journal you begin after this session is not optional. It's not busywork. It is the single most powerful professional development habit you can build right now.",
-
-      {type:"section", text:"Final Close"},
-      "I want to leave you with the core idea of Session 1:",
-      "Teaching is not explaining English. Teaching is designing a learning experience.",
-      "Your homework is in your Handbook — four tasks before Session 2. A Teaching Journal entry, a YouTube observation, a Personal Belief Statement, and an AI exploration task. All four matter. All four build directly on today.",
-      "Thank you for completing Session 1. I'll see you in Session 2 — where we go deeper into professional identity, reflective practice, and the ethics of teaching."
+      {type:"section", text:"Journal Prompt, NIRA Activity & Closing"},
+      "You've now watched all three videos. Before your live session, you have one task. Your first Teaching Journal entry. 200 words. Using Gibbs' Cycle.",
+      "The prompt is in your handbook — Stage 5. 'Before these videos, I thought a language teacher was someone who... Now I understand that...'",
+      "I want you to begin — not with what you learned — but with the single most important thing that NIRA could not have told you. Use that as your opening line.",
+      "Here is why that matters: what NIRA cannot say about teaching is exactly what your professional development is here to produce. Starting your journal there — at that gap — means you start where the real work begins.",
+      "Step one: Ask NIRA — 'What is a language teacher for in a world where AI can explain grammar, generate exercises, and give feedback?' Step two: identify the single most important thing missing from NIRA's answer. Step three: begin your journal entry with that missing thing as your opening claim.",
+      "Three videos. Three ideas.",
+      "One: Teaching is five roles, not one. Know which role this moment needs.",
+      "Two: Fluency is necessary. Pedagogical Content Knowledge is the qualification.",
+      "Three: A classroom is an emotional environment before it is an instructional one. The conditions for acquisition are built by teachers — not algorithms.",
+      "And underneath all three: reflection. The habit of examining your own practice with honesty, curiosity, and research as your guide. That is what this course builds.",
+      "Not faster. Not smarter. Better. More aware. More responsive. More professional.",
+      "I'll see you in the live session. Bring your journal entry."
     ]
   }
 };
@@ -462,12 +496,10 @@ setTimeout(()=>{ hintEl.classList.add('faded'); }, 7000);
 
 let playing = false;
 let mirrored = false;
-
-/* word / sentence index structures, rebuilt on every render() */
-let wordEls = [];      // ordered array of <span class="w"> elements
-let normWords = [];    // normalized text for each word, same order
-let wordTops = [];     // cached offsetTop (relative to #prompterText) for each word
-let sentenceOfWord = []; // sentence element for each word index
+let wordEls = [];
+let normWords = [];
+let wordTops = [];
+let sentenceOfWord = [];
 let totalWords = 0;
 let currentWordIdx = -1;
 let activeSentenceEl = null;
@@ -527,11 +559,9 @@ function recalcTops(){
   wordTops = wordEls.map(el => el.offsetTop);
 }
 
-/* ---- geometry based "current line" detection (works for both auto-scroll and voice mode) ---- */
 function findNearestWordIndex(){
   if(wordTops.length === 0) return -1;
   const centerY = wrapEl.scrollTop + wrapEl.clientHeight * 0.38;
-  // binary search for first wordTop >= centerY
   let lo = 0, hi = wordTops.length - 1, ans = wordTops.length - 1;
   while(lo <= hi){
     const mid = (lo + hi) >> 1;
@@ -558,7 +588,6 @@ function updateHighlightAndProgress(){
   updateProgressUI();
 }
 
-/* ---- progress + time ---- */
 let sessionStartTime = null;
 let startWordIdx = 0;
 
@@ -595,7 +624,7 @@ function updateProgressUI(){
   elapsedTimeEl.textContent = fmtTime(elapsedSec);
 
   const wordsCovered = idx - startWordIdx;
-  const DEFAULT_WPS = 2.3; // ~140 wpm fallback until we have real data
+  const DEFAULT_WPS = 2.3;
   let wps = DEFAULT_WPS;
   if(wordsCovered > 8 && elapsedSec > 3){
     wps = wordsCovered / elapsedSec;
@@ -608,13 +637,11 @@ function updateProgressUI(){
   remainingTimeEl.textContent = fmtTime(remainingSec);
 }
 
-/* ---- Auto-scroll (manual) mode ---- */
-let scrollPos = 0; // exact fractional scroll position, independent of the browser's rounded scrollTop
+let scrollPos = 0;
 
 function tick(){
   if(voiceActive && voiceTargetScroll !== null){
     const diff = voiceTargetScroll - scrollPos;
-    // ease toward the target; snap when very close to avoid endless tiny jitter
     if(Math.abs(diff) < 0.5){
       scrollPos = voiceTargetScroll;
     } else {
@@ -635,7 +662,7 @@ function tick(){
 }
 
 playBtn.addEventListener('click', ()=>{
-  if(voiceActive) return; // voice mode owns scrolling
+  if(voiceActive) return;
   playing = !playing;
   playBtn.textContent = playing ? "⏸ Pause" : "▶ Play";
   hintEl.classList.add('faded');
@@ -699,11 +726,11 @@ window.addEventListener('resize', ()=>{ requestAnimationFrame(recalcTops); });
 /* ===================== VOICE TRACKING ===================== */
 let recognition = null;
 let voiceActive = false;
-const LOOKAHEAD = 40;              // how far ahead of the current position we search for a match
-const LEAD_WORDS = 5;              // compensate for ~0.5-1.5s speech-recognition network latency
-const BUFFER_SIZE = 8;             // how many recent spoken words we consider for matching
-const MIN_BUFFER_FOR_MATCH = 3;    // don't even attempt a match until we have at least this many words
-const MATCH_THRESHOLD = 0.6;       // fraction of buffer words that must align before we trust the match
+const LOOKAHEAD = 40;
+const LEAD_WORDS = 5;
+const BUFFER_SIZE = 8;
+const MIN_BUFFER_FOR_MATCH = 3;
+const MATCH_THRESHOLD = 0.6;
 
 function showMicWarning(msg){
   micWarningEl.textContent = msg;
@@ -711,7 +738,7 @@ function showMicWarning(msg){
   setTimeout(()=>{ micWarningEl.style.display = 'none'; }, 6000);
 }
 
-let voiceTargetScroll = null; // desired scroll position from the latest confident voice match; null = not voice-driven yet
+let voiceTargetScroll = null;
 
 function scrollWordToCenter(idx){
   if(idx < 0 || idx >= wordTops.length) return;
@@ -719,15 +746,6 @@ function scrollWordToCenter(idx){
   voiceTargetScroll = Math.max(target, 0);
 }
 
-/*
- * Instead of chasing the single most-recent recognized word (which is fragile —
- * one misheard word causes a false jump), we keep a rolling buffer of the last
- * several spoken words and search a window of upcoming script text for the best
- * contiguous alignment. We only move the prompter if that alignment is strong
- * (most of the buffer matches) AND it's further ahead than where we already are.
- * Otherwise we hold position — a single bad recognition, a skipped word, or a
- * repeated phrase won't cause a stray jump.
- */
 function processSpokenWords(rawWords){
   const words = rawWords.map(norm).filter(Boolean);
   if(words.length === 0) return;
@@ -752,7 +770,7 @@ function processSpokenWords(rawWords){
     }
   }
 
-  if(bestOffset < 0 || bestScore < MATCH_THRESHOLD) return; // not confident enough — hold position
+  if(bestOffset < 0 || bestScore < MATCH_THRESHOLD) return;
 
   const matchedEndIdx = bestOffset + buffer.length - 1;
   if(matchedEndIdx > currentWordIdx){
@@ -787,10 +805,9 @@ function startVoiceTracking(){
   };
   recognition.onerror = (e)=>{
     if(e.error === 'not-allowed' || e.error === 'service-not-allowed'){
-      showMicWarning("Microphone access was blocked. Allow mic permission and try again. Note: opening this file directly (file://) may block mic access — serve it from a local server or web host instead.");
+      showMicWarning("Microphone access was blocked. Allow mic permission and try again.");
       stopVoiceTracking();
     }
-    // other errors (no-speech, network) - let onend restart it
   };
   recognition.onend = ()=>{
     if(voiceActive){
@@ -801,7 +818,7 @@ function startVoiceTracking(){
   try{
     recognition.start();
     voiceActive = true;
-    voiceTargetScroll = scrollPos; // start from current position, no initial jump
+    voiceTargetScroll = scrollPos;
     voiceBtn.classList.add('listening');
     voiceBtn.textContent = "🎙️ Listening… (click to stop)";
     playBtn.disabled = true;
