@@ -104,6 +104,10 @@
     min-width:90px;
     font-weight:bold;
   }
+  #rewindBtn, #forwardBtn{
+    min-width:44px;
+    font-weight:bold;
+  }
   #voiceBtn{
     min-width:150px;
     font-weight:bold;
@@ -288,7 +292,9 @@
       </div>
       <button id="mirrorBtn">Mirror</button>
       <button id="resetBtn">Restart</button>
+      <button id="rewindBtn" title="Rewind a couple sentences (Left arrow)">⏪</button>
       <button id="playBtn">▶ Play</button>
+      <button id="forwardBtn" title="Forward a couple sentences (Right arrow)">⏩</button>
     </div>
   </div>
 
@@ -305,7 +311,7 @@
     <div id="prompterText"></div>
     <div id="centerLine"></div>
     <div id="fadeBottom"></div>
-    <div id="hint">Space = play/pause · Up/Down arrows = adjust speed · Mouse scroll also works · Voice Tracking overrides manual scroll</div>
+    <div id="hint">Space = play/pause · Left/Right = rewind/forward · Up/Down = adjust speed · Mouse scroll also works · These work even during Voice Tracking</div>
     <div id="micWarning"></div>
   </div>
 </div>
@@ -479,6 +485,8 @@ const fontSlider = document.getElementById('fontSlider');
 const playBtn = document.getElementById('playBtn');
 const mirrorBtn = document.getElementById('mirrorBtn');
 const resetBtn = document.getElementById('resetBtn');
+const rewindBtn = document.getElementById('rewindBtn');
+const forwardBtn = document.getElementById('forwardBtn');
 const hintEl = document.getElementById('hint');
 const voiceBtn = document.getElementById('voiceBtn');
 const progressFill = document.getElementById('progressFill');
@@ -500,9 +508,12 @@ let wordEls = [];
 let normWords = [];
 let wordTops = [];
 let sentenceOfWord = [];
+let sentenceStartIndices = [];
 let totalWords = 0;
 let currentWordIdx = -1;
 let activeSentenceEl = null;
+
+const JUMP_SENTENCES = 2; // how many sentences Rewind/Forward move by
 
 function escapeHtml(s){
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -553,6 +564,16 @@ function indexWords(){
   sentenceOfWord = wordEls.map(el => el.closest('.sentence'));
   normWords = wordEls.map(el => norm(el.textContent));
   totalWords = wordEls.length;
+
+  // Build a lookup of the first word-index of every sentence, in document order.
+  sentenceStartIndices = [];
+  let lastSentence = null;
+  sentenceOfWord.forEach((s, i)=>{
+    if(s !== lastSentence){
+      sentenceStartIndices.push(i);
+      lastSentence = s;
+    }
+  });
 }
 
 function recalcTops(){
@@ -574,16 +595,20 @@ function findNearestWordIndex(){
   return ans;
 }
 
+function setActiveSentenceForIdx(idx){
+  const sEl = sentenceOfWord[idx];
+  if(sEl !== activeSentenceEl){
+    if(activeSentenceEl) activeSentenceEl.classList.remove('active-line');
+    if(sEl) sEl.classList.add('active-line');
+    activeSentenceEl = sEl;
+  }
+}
+
 function updateHighlightAndProgress(){
   const idx = findNearestWordIndex();
   if(idx !== currentWordIdx && idx >= 0){
     currentWordIdx = idx;
-    const sEl = sentenceOfWord[idx];
-    if(sEl !== activeSentenceEl){
-      if(activeSentenceEl) activeSentenceEl.classList.remove('active-line');
-      if(sEl) sEl.classList.add('active-line');
-      activeSentenceEl = sEl;
-    }
+    setActiveSentenceForIdx(idx);
   }
   updateProgressUI();
 }
@@ -639,6 +664,58 @@ function updateProgressUI(){
 
 let scrollPos = 0;
 
+/* ===================== JUMP TO WORD (Rewind / Forward) ===================== */
+// Moves the reading position directly to a given word index, updating
+// highlight + progress + scroll target — regardless of whether we're
+// playing, paused, or in the middle of Voice Tracking.
+function jumpToWordIndex(idx){
+  if(wordTops.length === 0) return;
+  idx = Math.max(0, Math.min(idx, wordTops.length - 1));
+  currentWordIdx = idx;
+  setActiveSentenceForIdx(idx);
+
+  const target = Math.max(wordTops[idx] - wrapEl.clientHeight * 0.38, 0);
+
+  if(voiceActive){
+    // Don't fight the live transcript matcher — just retarget where it eases to.
+    voiceTargetScroll = target;
+  } else {
+    scrollPos = target;
+    wrapEl.scrollTop = target;
+  }
+  updateProgressUI();
+}
+
+function currentSentenceStartPos(){
+  // Index (into sentenceStartIndices) of the sentence we're currently in/at.
+  const cur = Math.max(currentWordIdx, 0);
+  let si = 0;
+  for(let i = 0; i < sentenceStartIndices.length; i++){
+    if(sentenceStartIndices[i] <= cur) si = i;
+    else break;
+  }
+  return si;
+}
+
+function jumpSentences(delta){
+  if(sentenceStartIndices.length === 0) return;
+  const si = currentSentenceStartPos();
+  const targetSi = Math.max(0, Math.min(sentenceStartIndices.length - 1, si + delta));
+  jumpToWordIndex(sentenceStartIndices[targetSi]);
+}
+
+function doRewind(){
+  hintEl.classList.add('faded');
+  jumpSentences(-JUMP_SENTENCES);
+}
+function doForward(){
+  hintEl.classList.add('faded');
+  jumpSentences(JUMP_SENTENCES);
+}
+
+rewindBtn.addEventListener('click', doRewind);
+forwardBtn.addEventListener('click', doForward);
+
 function tick(){
   if(voiceActive && voiceTargetScroll !== null){
     const diff = voiceTargetScroll - scrollPos;
@@ -677,6 +754,7 @@ resetBtn.addEventListener('click', ()=>{
   scrollPos = 0;
   playing = false;
   playBtn.textContent = "▶ Play";
+  if(voiceActive) voiceTargetScroll = 0;
   resetProgressState();
 });
 
@@ -712,6 +790,12 @@ document.addEventListener('keydown', (e)=>{
   } else if(e.code === 'ArrowDown'){
     speedSlider.value = Math.max(1, parseInt(speedSlider.value)-2);
     syncSpeedReadout();
+  } else if(e.code === 'ArrowLeft'){
+    e.preventDefault();
+    doRewind();
+  } else if(e.code === 'ArrowRight'){
+    e.preventDefault();
+    doForward();
   }
 });
 
